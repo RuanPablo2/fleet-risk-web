@@ -1,0 +1,47 @@
+:host {
+  display: block;
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+input {
+  transition: all 0.25s ease-in-out;
+  border-color: #e5e7eb;
+
+  &:focus {
+    border-color: #0056b3;
+    box-shadow: 0 0 0 4px rgba(0, 86, 179, 0.15);
+    outline: none;
+  }
+}
+
+button[type="submit"] {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #0056b3;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, #0056b3, black 15%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 86, 179, 0.25);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98) translateY(0);
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

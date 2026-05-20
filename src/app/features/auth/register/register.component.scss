@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+input {
+  transition: all 0.2s ease-in-out;
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    outline: none;
+  }
+}
+
+button {
+  transition: transform 0.1s;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
