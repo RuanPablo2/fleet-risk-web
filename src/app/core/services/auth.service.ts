@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { environment } from '../../../enviroments/environment';
+import { environment } from '../../../environments/environment';
 
 export interface AuthResponse {
   token: string;

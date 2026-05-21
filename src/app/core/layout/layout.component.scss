@@ -1,0 +1,59 @@
+.layout-container {
+  @apply h-screen bg-gray-50;
+}
+
+.sidebar {
+  @apply w-64 border-r border-gray-200 flex flex-col justify-between;
+}
+
+.sidebar-header {
+  @apply h-16 flex items-center px-6 border-b border-gray-200;
+}
+
+.brand-icon {
+  @apply mr-2;
+}
+
+.brand-title {
+  @apply text-xl font-bold text-gray-800;
+}
+
+.sidebar-nav {
+  @apply flex-1 pt-2;
+}
+
+.active-link {
+  @apply bg-blue-50 border-r-4 border-blue-700;
+
+  .mdc-list-item__primary-text {
+    @apply text-blue-700 font-bold;
+  }
+}
+
+.sidebar-footer {
+  @apply p-4 border-t border-gray-200 mt-auto;
+}
+
+.logout-button {
+  @apply w-full flex justify-start px-2;
+}
+
+.main-wrapper {
+  @apply flex flex-col overflow-hidden;
+}
+
+.topbar {
+  @apply bg-white border-b border-gray-200 shadow-sm px-6;
+}
+
+.topbar-title {
+  @apply text-lg font-semibold text-gray-800;
+}
+
+.spacer {
+  @apply flex-auto;
+}
+
+.content-area {
+  @apply flex-1 p-8 overflow-y-auto bg-gray-50;
+}
