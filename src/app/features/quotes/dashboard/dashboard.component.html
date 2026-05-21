@@ -41,4 +41,85 @@
       </mat-card-content>
     </mat-card>
   </div>
+
+  <mat-card class="table-card">
+    <div class="table-header">
+      <h2 class="table-title">Cotações Recentes</h2>
+      <button mat-flat-button color="primary" routerLink="/quotes/new">
+        <mat-icon>add</mat-icon>
+        Nova Cotação
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table mat-table [dataSource]="quotes" class="fleet-table">
+        <ng-container matColumnDef="customerName">
+          <th mat-header-cell *matHeaderCellDef>Cliente / Segurado</th>
+          <td mat-cell *matCellDef="let quote" class="col-customer">
+            {{ quote.customerName }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Data</th>
+          <td mat-cell *matCellDef="let quote" class="col-date">
+            {{ quote.createdAt | date: "dd/MM/yyyy" }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let quote">
+            <span
+              class="status-badge"
+              [class]="'badge-' + quote.status.toLowerCase()"
+            >
+              {{ quote.status }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalPremium">
+          <th mat-header-cell *matHeaderCellDef>Prêmio Total</th>
+          <td mat-cell *matCellDef="let quote" class="col-premium">
+            @if (quote.totalPremium) {
+              {{ quote.totalPremium | currency: "BRL" : "symbol" }}
+            } @else {
+              <span class="premium-pending">Pendente</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="col-actions">Ações</th>
+          <td mat-cell *matCellDef="let quote" class="col-actions">
+            <button
+              mat-icon-button
+              color="primary"
+              [routerLink]="['/quotes', quote.id]"
+            >
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          class="fleet-row"
+        ></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-state" [colSpan]="displayedColumns.length">
+            @if (isLoading) {
+              Carregando dados...
+            } @else {
+              Nenhuma cotação encontrada. Crie sua primeira frota!
+            }
+          </td>
+        </tr>
+      </table>
+    </div>
+  </mat-card>
 </div>
