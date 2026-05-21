@@ -37,7 +37,7 @@ export class AuthService {
   logout() {
     localStorage.removeItem('fleetrisk_token');
     this.currentUserToken.set(null);
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/login']);
   }
 
   isAuthenticated(): boolean {

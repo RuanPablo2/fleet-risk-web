@@ -32,7 +32,7 @@ export class RegisterComponent {
       this.authService.register(this.registerForm.value).subscribe({
         next: () => {
           alert('Conta criada com sucesso! Faça o login.');
-          this.router.navigate(['/auth/login']);
+          this.router.navigate(['/login']);
         },
         error: (err) => {
           console.error('🚨 Erro ao registrar:', err);

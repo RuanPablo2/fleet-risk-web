@@ -1,3 +1,5 @@
+@reference "../../../../styles.scss";
+
 :host {
   display: block;
   animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -14,7 +16,41 @@
   }
 }
 
-input {
+.auth-container {
+  @apply flex items-center justify-center min-h-screen bg-gray-100;
+}
+
+.auth-card {
+  @apply w-full max-w-md p-8 bg-white rounded-lg shadow-md;
+}
+
+.auth-header {
+  @apply text-center mb-8;
+}
+
+.brand-title {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.brand-subtitle {
+  @apply text-sm text-gray-500;
+}
+
+.auth-form {
+  @apply space-y-6;
+}
+
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.form-input {
+  @apply w-full px-4 py-2 mt-1 border rounded-md;
+
   transition: all 0.25s ease-in-out;
   border-color: #e5e7eb;
 
@@ -25,7 +61,9 @@ input {
   }
 }
 
-button[type="submit"] {
+.auth-button {
+  @apply w-full px-4 py-2 text-white rounded-md mt-4;
+
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: #0056b3;
 
@@ -41,7 +79,25 @@ button[type="submit"] {
   }
 
   &:disabled {
+    @apply bg-gray-400 cursor-not-allowed;
     opacity: 0.6;
-    cursor: not-allowed;
+    background-color: #9ca3af;
   }
+}
+
+.auth-button--success {
+  @apply bg-green-600;
+  background-color: #16a34a;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, #16a34a, black 15%);
+  }
+}
+
+.auth-footer {
+  @apply mt-6 text-center text-sm text-gray-600;
+}
+
+.auth-link {
+  @apply text-blue-600 hover:underline;
 }
