@@ -1,1 +1,44 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1 class="page-title">Visão Geral</h1>
+    <p class="page-subtitle">Acompanhe o funil de vendas da sua corretora.</p>
+  </header>
+
+  <div class="kpi-grid">
+    <mat-card class="kpi-card card-pending">
+      <mat-card-content class="kpi-content">
+        <div class="kpi-info">
+          <p class="kpi-title">Rascunhos Pendentes</p>
+          <h3 class="kpi-value">{{ kpis.pending }}</h3>
+        </div>
+        <div class="kpi-icon-wrapper icon-pending">
+          <mat-icon>edit_document</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card card-calculated">
+      <mat-card-content class="kpi-content">
+        <div class="kpi-info">
+          <p class="kpi-title">Aguardando Aprovação</p>
+          <h3 class="kpi-value">{{ kpis.calculated }}</h3>
+        </div>
+        <div class="kpi-icon-wrapper icon-calculated">
+          <mat-icon>hourglass_empty</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card card-approved">
+      <mat-card-content class="kpi-content">
+        <div class="kpi-info">
+          <p class="kpi-title">Cotações Aprovadas</p>
+          <h3 class="kpi-value">{{ kpis.approved }}</h3>
+        </div>
+        <div class="kpi-icon-wrapper icon-approved">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

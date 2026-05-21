@@ -1,0 +1,86 @@
+@reference "../../../../styles.scss";
+
+.dashboard-container {
+  @apply flex flex-col gap-6;
+}
+
+.dashboard-header {
+  @apply mb-2;
+}
+
+.page-title {
+  @apply text-2xl font-bold text-gray-800 m-0;
+}
+
+.page-subtitle {
+  @apply text-sm text-gray-500 mt-1;
+}
+
+.kpi-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+}
+
+.kpi-card {
+  @apply rounded-xl border-l-4 shadow-sm transition-transform duration-200 cursor-default;
+
+  &:hover {
+    @apply -translate-y-1 shadow-md;
+  }
+}
+
+.kpi-content {
+  @apply flex items-center justify-between p-6;
+}
+
+.kpi-info {
+  @apply flex flex-col;
+}
+
+.kpi-title {
+  @apply text-sm font-medium mb-1 uppercase tracking-wider;
+}
+
+.kpi-value {
+  @apply text-4xl font-bold m-0;
+}
+
+.kpi-icon-wrapper {
+  @apply w-14 h-14 rounded-full flex items-center justify-center;
+
+  mat-icon {
+    @apply scale-150;
+  }
+}
+
+.card-pending {
+  @apply border-gray-400;
+  .kpi-title,
+  .kpi-value {
+    @apply text-gray-700;
+  }
+}
+.icon-pending {
+  @apply bg-gray-100 text-gray-600;
+}
+
+.card-calculated {
+  @apply border-blue-500;
+  .kpi-title,
+  .kpi-value {
+    @apply text-blue-700;
+  }
+}
+.icon-calculated {
+  @apply bg-blue-100 text-blue-700;
+}
+
+.card-approved {
+  @apply border-green-500;
+  .kpi-title,
+  .kpi-value {
+    @apply text-green-700;
+  }
+}
+.icon-approved {
+  @apply bg-green-100 text-green-700;
+}
