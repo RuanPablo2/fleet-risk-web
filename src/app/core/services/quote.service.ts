@@ -52,7 +52,7 @@ export class QuoteService {
     return this.http.post<{ id: number }>(this.apiUrl, data);
   }
 
-  calculateQuote(id: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${id}/calculate`, {});
+  calculateQuote(id: number, data: CreateQuoteRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/calculate`, data);
   }
 }
