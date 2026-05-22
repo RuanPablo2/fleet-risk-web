@@ -18,6 +18,20 @@ export interface PageResponse<T> {
   totalPages: number;
 }
 
+export interface VehicleQuote {
+  licensePlate: string;
+  fipeCode: string;
+  yearId: string;
+  coverageLimit: number;
+}
+
+export interface CreateQuoteRequest {
+  customerName: string;
+  customerCnpj: string;
+  brokerName: string;
+  vehicles: VehicleQuote[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -32,5 +46,13 @@ export class QuoteService {
     return this.http.get<PageResponse<QuoteSummary>>(
       `${this.apiUrl}?page=${page}&size=${size}`,
     );
+  }
+
+  createQuote(data: CreateQuoteRequest): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(this.apiUrl, data);
+  }
+
+  calculateQuote(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/calculate`, {});
   }
 }

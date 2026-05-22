@@ -24,6 +24,13 @@ export const routes: Routes = [
       import('./core/layout/layout.component').then((m) => m.LayoutComponent),
     children: [
       {
+        path: 'quotes/new',
+        loadComponent: () =>
+          import('./features/quotes/quote-create/quote-create.component').then(
+            (m) => m.QuoteCreateComponent,
+          ),
+      },
+      {
         path: 'quotes',
         loadComponent: () =>
           import('./features/quotes/dashboard/dashboard.component').then(

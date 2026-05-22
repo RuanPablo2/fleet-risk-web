@@ -1,0 +1,99 @@
+@reference "../../../../styles.scss";
+
+.create-container {
+  @apply max-w-4xl mx-auto flex flex-col gap-6;
+}
+
+.create-header {
+  @apply mb-2;
+}
+
+.header-actions {
+  @apply mb-4;
+}
+
+.back-button {
+  @apply inline-flex items-center text-sm font-medium text-gray-600 hover:text-blue-700 transition-colors bg-transparent border-none cursor-pointer p-0;
+
+  mat-icon {
+    @apply mr-1 text-lg;
+  }
+}
+
+.page-title {
+  @apply text-2xl font-bold text-gray-800 m-0;
+}
+
+.page-subtitle {
+  @apply text-sm text-gray-500 mt-1;
+}
+
+.form-card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
+}
+
+.step-content {
+  @apply p-4 flex flex-col gap-6;
+}
+
+.form-group {
+  @apply flex flex-col;
+}
+
+.form-label {
+  @apply text-sm font-semibold text-gray-700 mb-2;
+}
+
+.form-input {
+  @apply px-4 py-2 border rounded-md text-gray-800 bg-gray-50 h-10;
+
+  transition: all 0.25s ease-in-out;
+  border-color: #e5e7eb;
+
+  &:focus {
+    @apply bg-white;
+    border-color: #0056b3;
+    box-shadow: 0 0 0 4px rgba(0, 86, 179, 0.15);
+    outline: none;
+  }
+}
+
+.vehicle-form-grid {
+  @apply grid grid-cols-1 md:grid-cols-6 gap-4 items-end bg-blue-50 p-6 rounded-lg border border-blue-100;
+
+  .add-vehicle-action {
+    @apply flex h-10 items-center justify-center;
+  }
+}
+
+.vehicles-table-container {
+  @apply border border-gray-200 rounded-lg overflow-hidden;
+}
+
+.fleet-table {
+  @apply w-full bg-white;
+
+  th.mat-header-cell {
+    @apply text-gray-500 font-semibold uppercase text-xs tracking-wider border-b border-gray-200 bg-gray-50/50 px-4;
+  }
+
+  td.mat-cell {
+    @apply border-b border-gray-100 px-4 py-2;
+  }
+}
+
+.empty-state {
+  @apply text-center py-8 text-gray-500 font-medium bg-gray-50;
+}
+
+.step-actions {
+  @apply mt-6 pt-4 border-t border-gray-100 flex;
+}
+
+.flex-end {
+  @apply justify-end;
+}
+
+.split-actions {
+  @apply justify-between;
+}
