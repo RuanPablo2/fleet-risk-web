@@ -1,28 +1,29 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { DatePipe, CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { CurrencyPipe, NgClass } from '@angular/common';
 import {
   QuoteService,
-  QuoteSummary,
+  QuoteResponse,
+  QuoteKpiResponse,
 } from '../../../core/services/quote.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    MatCardModule,
-    MatIconModule,
-    MatTableModule,
-    MatButtonModule,
-    MatChipsModule,
-    DatePipe,
-    CurrencyPipe,
     RouterLink,
+    MatTableModule,
+    MatPaginatorModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    CurrencyPipe,
+    NgClass,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -30,34 +31,79 @@ import {
 export class DashboardComponent implements OnInit {
   private quoteService = inject(QuoteService);
 
+  quotes: QuoteResponse[] = [];
+  kpis: QuoteKpiResponse = { pending: 0, calculated: 0, approved: 0 };
+
   displayedColumns: string[] = [
+    'id',
     'customerName',
-    'createdAt',
-    'status',
+    'customerCnpj',
     'totalPremium',
+    'status',
     'actions',
   ];
 
-  quotes: QuoteSummary[] = [];
-  isLoading = true;
-
-  kpis = { pending: 12, calculated: 5, approved: 28 };
+  totalElements = 0;
+  pageSize = 10;
+  currentPage = 0;
+  isLoading = false;
 
   ngOnInit() {
     this.loadQuotes();
+    this.loadKpis();
+  }
+
+  loadKpis() {
+    this.quoteService.getKpis().subscribe({
+      next: (data) => (this.kpis = data),
+      error: (err) => console.error('Erro ao carregar KPIs', err),
+    });
   }
 
   loadQuotes() {
     this.isLoading = true;
-    this.quoteService.getQuotes(0, 10).subscribe({
-      next: (response) => {
-        this.quotes = response.content;
+    this.quoteService.getQuotes(this.currentPage, this.pageSize).subscribe({
+      next: (page) => {
+        this.quotes = page.content;
+        this.totalElements = page.totalElements;
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error searching for quotes.', err);
+        console.error('Erro ao carregar cotações:', err);
         this.isLoading = false;
       },
     });
+  }
+
+  onPageChange(event: PageEvent) {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadQuotes();
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'PENDING':
+        return 'status-pending';
+      case 'CALCULATED':
+        return 'status-calculated';
+      case 'APPROVED':
+        return 'status-approved';
+      default:
+        return 'status-default';
+    }
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'PENDING':
+        return 'Pendente';
+      case 'CALCULATED':
+        return 'Calculado';
+      case 'APPROVED':
+        return 'Aprovado';
+      default:
+        return status;
+    }
   }
 }

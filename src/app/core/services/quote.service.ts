@@ -3,19 +3,21 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface QuoteSummary {
-  id: string;
-  customerName: string;
-  status: 'PENDING' | 'CALCULATED' | 'APPROVED';
-  createdAt: string;
-  updatedAt: string;
-  totalPremium?: number;
-}
-
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
   totalPages: number;
+  size: number;
+  number: number;
+}
+
+export interface QuoteResponse {
+  id: number;
+  customerName: string;
+  customerCnpj: string;
+  brokerName: string;
+  totalPremium: number | null;
+  status: string;
 }
 
 export interface VehicleQuote {
@@ -32,6 +34,12 @@ export interface CreateQuoteRequest {
   vehicles: VehicleQuote[];
 }
 
+export interface QuoteKpiResponse {
+  pending: number;
+  calculated: number;
+  approved: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -42,8 +50,8 @@ export class QuoteService {
   getQuotes(
     page: number = 0,
     size: number = 10,
-  ): Observable<PageResponse<QuoteSummary>> {
-    return this.http.get<PageResponse<QuoteSummary>>(
+  ): Observable<PageResponse<QuoteResponse>> {
+    return this.http.get<PageResponse<QuoteResponse>>(
       `${this.apiUrl}?page=${page}&size=${size}`,
     );
   }
@@ -54,5 +62,9 @@ export class QuoteService {
 
   calculateQuote(id: number, data: CreateQuoteRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/${id}/calculate`, data);
+  }
+
+  getKpis(): Observable<QuoteKpiResponse> {
+    return this.http.get<QuoteKpiResponse>(`${this.apiUrl}/kpis`);
   }
 }

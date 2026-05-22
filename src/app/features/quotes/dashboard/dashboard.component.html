@@ -1,8 +1,14 @@
 <div class="dashboard-container">
-  <header class="dashboard-header">
-    <h1 class="page-title">Visão Geral</h1>
-    <p class="page-subtitle">Acompanhe o funil de vendas da sua corretora.</p>
-  </header>
+  <div class="dashboard-header">
+    <div>
+      <h1 class="page-title">Visão Geral</h1>
+      <p class="page-subtitle">Acompanhe o funil de vendas da sua corretora.</p>
+    </div>
+    <button mat-flat-button color="primary" routerLink="/quotes/new">
+      <mat-icon>add</mat-icon>
+      Nova Cotação
+    </button>
+  </div>
 
   <div class="kpi-grid">
     <mat-card class="kpi-card card-pending">
@@ -20,7 +26,7 @@
     <mat-card class="kpi-card card-calculated">
       <mat-card-content class="kpi-content">
         <div class="kpi-info">
-          <p class="kpi-title">Aguardando Aprovação</p>
+          <p class="kpi-title">Calculados (Aguardando)</p>
           <h3 class="kpi-value">{{ kpis.calculated }}</h3>
         </div>
         <div class="kpi-icon-wrapper icon-calculated">
@@ -42,63 +48,60 @@
     </mat-card>
   </div>
 
-  <mat-card class="table-card">
-    <div class="table-header">
-      <h2 class="table-title">Cotações Recentes</h2>
-      <button mat-flat-button color="primary" routerLink="/quotes/new">
-        <mat-icon>add</mat-icon>
-        Nova Cotação
-      </button>
-    </div>
-
+  <div class="table-card">
     <div class="table-container">
-      <table mat-table [dataSource]="quotes" class="fleet-table">
+      <table mat-table [dataSource]="quotes" class="dashboard-table">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let q" class="font-semibold text-gray-700">
+            #{{ q.id }}
+          </td>
+        </ng-container>
+
         <ng-container matColumnDef="customerName">
-          <th mat-header-cell *matHeaderCellDef>Cliente / Segurado</th>
-          <td mat-cell *matCellDef="let quote" class="col-customer">
-            {{ quote.customerName }}
+          <th mat-header-cell *matHeaderCellDef>Segurado / Razão Social</th>
+          <td mat-cell *matCellDef="let q" class="font-medium text-gray-900">
+            {{ q.customerName }}
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="createdAt">
-          <th mat-header-cell *matHeaderCellDef>Data</th>
-          <td mat-cell *matCellDef="let quote" class="col-date">
-            {{ quote.createdAt | date: "dd/MM/yyyy" }}
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
-          <td mat-cell *matCellDef="let quote">
-            <span
-              class="status-badge"
-              [class]="'badge-' + quote.status.toLowerCase()"
-            >
-              {{ quote.status }}
-            </span>
+        <ng-container matColumnDef="customerCnpj">
+          <th mat-header-cell *matHeaderCellDef>CNPJ</th>
+          <td mat-cell *matCellDef="let q" class="text-gray-500">
+            {{ q.customerCnpj }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="totalPremium">
           <th mat-header-cell *matHeaderCellDef>Prêmio Total</th>
-          <td mat-cell *matCellDef="let quote" class="col-premium">
-            @if (quote.totalPremium) {
-              {{ quote.totalPremium | currency: "BRL" : "symbol" }}
+          <td mat-cell *matCellDef="let q" class="font-semibold text-gray-800">
+            @if (q.totalPremium) {
+              {{ q.totalPremium | currency: "BRL" : "symbol" }}
             } @else {
-              <span class="premium-pending">Pendente</span>
+              <span class="text-gray-400 font-normal">—</span>
             }
           </td>
         </ng-container>
 
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let q">
+            <span class="status-badge" [ngClass]="getStatusClass(q.status)">
+              {{ getStatusLabel(q.status) }}
+            </span>
+          </td>
+        </ng-container>
+
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="col-actions">Ações</th>
-          <td mat-cell *matCellDef="let quote" class="col-actions">
+          <th mat-header-cell *matHeaderCellDef class="text-center">Ações</th>
+          <td mat-cell *matCellDef="let q" class="text-center">
             <button
               mat-icon-button
               color="primary"
-              [routerLink]="['/quotes', quote.id]"
+              [routerLink]="['/quotes/edit', q.id]"
+              title="Editar/Ver Detalhes"
             >
-              <mat-icon>chevron_right</mat-icon>
+              <mat-icon>edit</mat-icon>
             </button>
           </td>
         </ng-container>
@@ -107,19 +110,26 @@
         <tr
           mat-row
           *matRowDef="let row; columns: displayedColumns"
-          class="fleet-row"
+          class="hover:bg-gray-50 transition-colors"
         ></tr>
-
-        <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell empty-state" [colSpan]="displayedColumns.length">
-            @if (isLoading) {
-              Carregando dados...
-            } @else {
-              Nenhuma cotação encontrada. Crie sua primeira frota!
-            }
-          </td>
-        </tr>
       </table>
+
+      @if (quotes.length === 0 && !isLoading) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">description</mat-icon>
+          <p>Nenhuma cotação encontrada. Crie sua primeira frota!</p>
+        </div>
+      }
     </div>
-  </mat-card>
+
+    <mat-paginator
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20]"
+      [pageIndex]="currentPage"
+      (page)="onPageChange($event)"
+      aria-label="Selecione a página"
+    >
+    </mat-paginator>
+  </div>
 </div>
