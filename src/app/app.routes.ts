@@ -24,6 +24,13 @@ export const routes: Routes = [
       import('./core/layout/layout.component').then((m) => m.LayoutComponent),
     children: [
       {
+        path: 'quotes',
+        loadComponent: () =>
+          import('./features/quotes/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent,
+          ),
+      },
+      {
         path: 'quotes/new',
         loadComponent: () =>
           import('./features/quotes/quote-create/quote-create.component').then(
@@ -31,10 +38,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'quotes',
+        path: 'quotes/edit/:id',
         loadComponent: () =>
-          import('./features/quotes/dashboard/dashboard.component').then(
-            (m) => m.DashboardComponent,
+          import('./features/quotes/quote-edit/quote-edit.component').then(
+            (m) => m.QuoteEditComponent,
           ),
       },
     ],

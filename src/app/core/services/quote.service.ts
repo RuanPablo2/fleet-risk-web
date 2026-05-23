@@ -40,6 +40,27 @@ export interface QuoteKpiResponse {
   approved: number;
 }
 
+export interface QuoteVehicleDetails {
+  id: number;
+  licensePlate: string;
+  fipeCode: string;
+  yearId: string;
+  coverageLimit: number;
+  modelName: string;
+  fipeValue: number;
+  calculatedPremium: number | null;
+}
+
+export interface QuoteDetails {
+  id: number;
+  customerName: string;
+  customerCnpj: string;
+  brokerName: string;
+  status: string;
+  totalPremium: number | null;
+  vehicles: QuoteVehicleDetails[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -66,5 +87,13 @@ export class QuoteService {
 
   getKpis(): Observable<QuoteKpiResponse> {
     return this.http.get<QuoteKpiResponse>(`${this.apiUrl}/kpis`);
+  }
+
+  getQuoteById(id: number): Observable<QuoteDetails> {
+    return this.http.get<QuoteDetails>(`${this.apiUrl}/${id}`);
+  }
+
+  updateQuote(id: number, data: CreateQuoteRequest): Observable<QuoteResponse> {
+    return this.http.put<QuoteResponse>(`${this.apiUrl}/${id}`, data);
   }
 }
