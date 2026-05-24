@@ -118,7 +118,7 @@ export class QuoteService {
   }
 
   downloadProposal(id: number): Observable<Blob> {
-    return this.http.get(`${this.documentApiUrl}/quotes/${id}/pdf`, {
+    return this.http.get(`${this.documentApiUrl}/quotes/${id}/download`, {
       responseType: 'blob',
     });
   }
