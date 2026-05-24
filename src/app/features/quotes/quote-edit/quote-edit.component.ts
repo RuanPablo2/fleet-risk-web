@@ -33,6 +33,8 @@ import {
   VehicleYear,
 } from '../../../core/services/vehicle.service';
 
+import { WebsocketService } from '../../../core/services/websocket.service';
+
 @Component({
   selector: 'app-quote-edit',
   standalone: true,
@@ -57,10 +59,13 @@ export class QuoteEditComponent implements OnInit {
   private vehicleService = inject(VehicleService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private websocketService = inject(WebsocketService);
 
   quoteId!: number;
   isLoadingData = true;
   isSubmitting = false;
+  isCalculating = false;
+  quoteDetails?: QuoteDetails;
 
   customerForm: FormGroup = this.fb.group({
     customerName: ['', [Validators.required, Validators.minLength(3)]],
@@ -110,11 +115,21 @@ export class QuoteEditComponent implements OnInit {
         return of([]);
       }),
     );
+
+    this.websocketService.watchQuoteStatus(this.quoteId).subscribe((status) => {
+      if (status === 'CALCULATED') {
+        console.log('Recarregando a tela...');
+        this.isSubmitting = false;
+        this.isCalculating = false;
+        this.loadQuoteData();
+      }
+    });
   }
 
   loadQuoteData() {
     this.quoteService.getQuoteById(this.quoteId).subscribe({
       next: (quote: QuoteDetails) => {
+        this.quoteDetails = quote;
         this.customerForm.patchValue({
           customerName: quote.customerName,
           customerCnpj: quote.customerCnpj,
@@ -202,11 +217,15 @@ export class QuoteEditComponent implements OnInit {
       };
 
       if (shouldCalculate) {
+        this.isCalculating = true;
         this.quoteService.calculateQuote(this.quoteId, payload).subscribe({
-          next: () => this.router.navigate(['/quotes']),
+          next: () => {
+            console.log('Cálculo enviado para a fila. Aguardando retorno...');
+          },
           error: (err) => {
             console.error('Erro ao calcular:', err);
             this.isSubmitting = false;
+            this.isCalculating = false;
           },
         });
       } else {

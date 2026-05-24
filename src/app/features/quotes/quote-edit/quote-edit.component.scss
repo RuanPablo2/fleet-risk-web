@@ -97,3 +97,35 @@
 .split-actions {
   @apply justify-between;
 }
+
+.header-content {
+  @apply flex justify-between items-center mt-4;
+}
+
+.premium-summary-container {
+  @apply mt-2 p-6 bg-gray-50 border border-gray-200 rounded-lg flex justify-end items-center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.premium-summary-content {
+  @apply text-right;
+}
+
+.premium-summary-label {
+  @apply text-sm font-medium text-gray-500 uppercase tracking-widest m-0 mb-1;
+}
+
+.premium-summary-value {
+  @apply text-4xl font-bold text-blue-900 m-0 tracking-tight;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

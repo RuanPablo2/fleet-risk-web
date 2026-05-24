@@ -5,10 +5,15 @@
         <mat-icon>arrow_back</mat-icon> Voltar
       </button>
     </div>
-    <h1 class="page-title">Editar Cotação #{{ quoteId }}</h1>
-    <p class="page-subtitle">
-      Ajuste os dados do segurado ou a composição da frota.
-    </p>
+
+    <div class="header-content">
+      <div>
+        <h1 class="page-title">Editar Cotação #{{ quoteId }}</h1>
+        <p class="page-subtitle">
+          Ajuste os dados do segurado ou a composição da frota.
+        </p>
+      </div>
+    </div>
   </div>
 
   @if (isLoadingData) {
@@ -202,31 +207,56 @@
             </table>
           </div>
 
+          <!-- NOVO LOCAL DO PRÊMIO TOTAL -->
+          @if (quoteDetails?.totalPremium) {
+            <div class="premium-summary-container">
+              <div class="premium-summary-content">
+                <p class="premium-summary-label">Prêmio Total da Frota</p>
+                <p class="premium-summary-value">
+                  {{ quoteDetails?.totalPremium | currency: "BRL" : "symbol" }}
+                </p>
+              </div>
+            </div>
+          }
+
           <div class="step-actions split-actions">
             <button
               mat-button
               matStepperPrevious
               type="button"
-              [disabled]="isSubmitting"
+              [disabled]="isSubmitting || isCalculating"
             >
               Voltar
             </button>
-            <div class="flex gap-4">
+
+            <div class="flex gap-4 items-center">
+              @if (isCalculating) {
+                <div class="text-blue-600 font-medium flex items-center gap-2">
+                  <mat-spinner diameter="20"></mat-spinner>
+                  Aguardando Motor Atuarial...
+                </div>
+              }
+
               <button
                 mat-stroked-button
                 color="primary"
                 type="button"
                 (click)="onSubmit(false)"
-                [disabled]="vehicles.length === 0 || isSubmitting"
+                [disabled]="
+                  vehicles.length === 0 || isSubmitting || isCalculating
+                "
               >
                 Salvar Alterações
               </button>
+
               <button
                 mat-flat-button
                 color="primary"
                 type="button"
                 (click)="onSubmit(true)"
-                [disabled]="vehicles.length === 0 || isSubmitting"
+                [disabled]="
+                  vehicles.length === 0 || isSubmitting || isCalculating
+                "
               >
                 <mat-icon>calculate</mat-icon> Recalcular Frota
               </button>
