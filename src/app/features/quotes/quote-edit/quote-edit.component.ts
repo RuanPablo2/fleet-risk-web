@@ -105,6 +105,10 @@ export class QuoteEditComponent implements OnInit {
     this.quoteId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadQuoteData();
 
+    if (history.state && history.state.isCalculating) {
+      this.isCalculating = true;
+    }
+
     this.customerForm.valueChanges.subscribe(() => {
       this.resetCalculationState();
     });

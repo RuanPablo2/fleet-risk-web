@@ -192,11 +192,15 @@ export class QuoteCreateComponent implements OnInit {
         next: (response) => {
           if (shouldCalculate) {
             this.quoteService.calculateQuote(response.id, payload).subscribe({
-              next: () => this.router.navigate(['/quotes']),
+              next: () => {
+                this.router.navigate(['/quotes/edit', response.id], {
+                  state: { isCalculating: true },
+                });
+              },
               error: (err) => {
                 console.error('Erro ao acionar cálculo:', err);
                 alert('Rascunho salvo, mas erro ao calcular.');
-                this.router.navigate(['/quotes']);
+                this.router.navigate(['/quotes/edit', response.id]);
               },
             });
           } else {
