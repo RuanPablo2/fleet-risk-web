@@ -5,7 +5,9 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CurrencyPipe, NgClass } from '@angular/common';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import {
   QuoteService,
   QuoteResponse,
@@ -22,6 +24,7 @@ import {
     MatButtonModule,
     MatIconModule,
     MatCardModule,
+    ReactiveFormsModule,
     CurrencyPipe,
     NgClass,
   ],
@@ -30,6 +33,7 @@ import {
 })
 export class DashboardComponent implements OnInit {
   private quoteService = inject(QuoteService);
+  private fb = inject(FormBuilder);
 
   quotes: QuoteResponse[] = [];
   kpis: QuoteKpiResponse = { pending: 0, calculated: 0, approved: 0 };
@@ -48,9 +52,21 @@ export class DashboardComponent implements OnInit {
   currentPage = 0;
   isLoading = false;
 
+  filterForm: FormGroup = this.fb.group({
+    term: [''],
+    status: [''],
+  });
+
   ngOnInit() {
     this.loadQuotes();
     this.loadKpis();
+
+    this.filterForm.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        this.currentPage = 0;
+        this.loadQuotes();
+      });
   }
 
   loadKpis() {
@@ -62,23 +78,31 @@ export class DashboardComponent implements OnInit {
 
   loadQuotes() {
     this.isLoading = true;
-    this.quoteService.getQuotes(this.currentPage, this.pageSize).subscribe({
-      next: (page) => {
-        this.quotes = page.content;
-        this.totalElements = page.totalElements;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Erro ao carregar cotações:', err);
-        this.isLoading = false;
-      },
-    });
+    const filters = this.filterForm.value;
+
+    this.quoteService
+      .getQuotes(this.currentPage, this.pageSize, filters)
+      .subscribe({
+        next: (page) => {
+          this.quotes = page.content;
+          this.totalElements = page.totalElements;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Erro ao carregar cotações:', err);
+          this.isLoading = false;
+        },
+      });
   }
 
   onPageChange(event: PageEvent) {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
     this.loadQuotes();
+  }
+
+  clearFilters() {
+    this.filterForm.reset({ term: '', status: '' });
   }
 
   getStatusClass(status: string): string {

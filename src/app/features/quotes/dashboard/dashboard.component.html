@@ -48,6 +48,46 @@
     </mat-card>
   </div>
 
+  <div class="filter-bar form-card mb-6 mt-2">
+    <form [formGroup]="filterForm" class="filter-grid">
+      <div class="filter-group">
+        <label class="filter-label">Buscar Segurado</label>
+        <div class="search-input-wrapper">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input
+            type="text"
+            formControlName="term"
+            class="filter-input with-icon"
+            placeholder="Nome, Razão Social ou CNPJ"
+          />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Status da Cotação</label>
+        <select formControlName="status" class="filter-input">
+          <option value="">Todos os Status</option>
+          <option value="PENDING">Pendentes (Rascunhos)</option>
+          <option value="CALCULATED">Calculados</option>
+          <option value="APPROVED">Aprovados</option>
+        </select>
+      </div>
+
+      @if (filterForm.value.term || filterForm.value.status) {
+        <div class="filter-action">
+          <button
+            mat-button
+            color="warn"
+            type="button"
+            (click)="clearFilters()"
+          >
+            Limpar
+          </button>
+        </div>
+      }
+    </form>
+  </div>
+
   <div class="table-card">
     <div class="table-container">
       <table mat-table [dataSource]="quotes" class="dashboard-table">

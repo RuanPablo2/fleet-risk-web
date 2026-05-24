@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -73,10 +73,20 @@ export class QuoteService {
   getQuotes(
     page: number = 0,
     size: number = 10,
+    filters?: { term?: string; status?: string },
   ): Observable<PageResponse<QuoteResponse>> {
-    return this.http.get<PageResponse<QuoteResponse>>(
-      `${this.apiUrl}?page=${page}&size=${size}`,
-    );
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (filters?.term) {
+      params = params.set('term', filters.term);
+    }
+    if (filters?.status) {
+      params = params.set('status', filters.status);
+    }
+
+    return this.http.get<PageResponse<QuoteResponse>>(this.apiUrl, { params });
   }
 
   createQuote(data: CreateQuoteRequest): Observable<{ id: number }> {
