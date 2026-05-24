@@ -207,7 +207,6 @@
             </table>
           </div>
 
-          <!-- NOVO LOCAL DO PRÊMIO TOTAL -->
           @if (quoteDetails?.totalPremium) {
             <div class="premium-summary-container">
               <div class="premium-summary-content">
@@ -224,43 +223,95 @@
               mat-button
               matStepperPrevious
               type="button"
-              [disabled]="isSubmitting || isCalculating"
+              [disabled]="isSubmitting || isCalculating || isActionProcessing"
             >
               Voltar
             </button>
 
-            <div class="flex gap-4 items-center">
-              @if (isCalculating) {
-                <div class="text-blue-600 font-medium flex items-center gap-2">
-                  <mat-spinner diameter="20"></mat-spinner>
-                  Aguardando Motor Atuarial...
+            @if (!isApproved) {
+              <div class="flex gap-4 items-center">
+                @if (isCalculating) {
+                  <div
+                    class="text-blue-600 font-medium flex items-center gap-2"
+                  >
+                    <mat-spinner diameter="20"></mat-spinner>
+                    Aguardando Motor Atuarial...
+                  </div>
+                }
+
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  type="button"
+                  (click)="onSubmit(false)"
+                  [disabled]="
+                    vehicles.length === 0 ||
+                    isSubmitting ||
+                    isCalculating ||
+                    isActionProcessing
+                  "
+                >
+                  Salvar Alterações
+                </button>
+
+                <button
+                  mat-flat-button
+                  color="primary"
+                  type="button"
+                  (click)="onSubmit(true)"
+                  [disabled]="
+                    vehicles.length === 0 ||
+                    isSubmitting ||
+                    isCalculating ||
+                    isActionProcessing
+                  "
+                >
+                  <mat-icon>calculate</mat-icon> Recalcular Frota
+                </button>
+
+                @if (quoteDetails?.totalPremium) {
+                  <button
+                    mat-flat-button
+                    color="accent"
+                    type="button"
+                    (click)="onApproveQuote()"
+                    [disabled]="
+                      isSubmitting || isCalculating || isActionProcessing
+                    "
+                  >
+                    <mat-icon>check_circle</mat-icon> Aprovar Cotação
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="flex gap-4 items-center">
+                <div
+                  class="text-green-700 font-medium flex items-center gap-2 mr-4 bg-green-50 px-3 py-1 rounded-full border border-green-200"
+                >
+                  <mat-icon class="text-sm">verified</mat-icon> Proposta gerada
                 </div>
-              }
 
-              <button
-                mat-stroked-button
-                color="primary"
-                type="button"
-                (click)="onSubmit(false)"
-                [disabled]="
-                  vehicles.length === 0 || isSubmitting || isCalculating
-                "
-              >
-                Salvar Alterações
-              </button>
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  type="button"
+                  (click)="onResendEmail()"
+                  [disabled]="isActionProcessing"
+                >
+                  <mat-icon>send</mat-icon> Reenviar E-mail
+                </button>
 
-              <button
-                mat-flat-button
-                color="primary"
-                type="button"
-                (click)="onSubmit(true)"
-                [disabled]="
-                  vehicles.length === 0 || isSubmitting || isCalculating
-                "
-              >
-                <mat-icon>calculate</mat-icon> Recalcular Frota
-              </button>
-            </div>
+                <button
+                  mat-flat-button
+                  color="primary"
+                  type="button"
+                  (click)="onDownloadProposal()"
+                  [disabled]="isActionProcessing"
+                >
+                  <mat-icon>download</mat-icon> Baixar Proposta (PDF)
+                </button>
+              </div>
+            }
           </div>
         </div>
       </mat-step>

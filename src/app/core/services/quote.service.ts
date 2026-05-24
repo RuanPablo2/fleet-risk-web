@@ -66,7 +66,9 @@ export interface QuoteDetails {
 })
 export class QuoteService {
   private http = inject(HttpClient);
+
   private apiUrl = `${environment.apiUrl}/quotes`;
+  private documentApiUrl = `${environment.apiUrl}/documents`;
 
   getQuotes(
     page: number = 0,
@@ -95,5 +97,19 @@ export class QuoteService {
 
   updateQuote(id: number, data: CreateQuoteRequest): Observable<QuoteResponse> {
     return this.http.put<QuoteResponse>(`${this.apiUrl}/${id}`, data);
+  }
+
+  approveQuote(id: number): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${id}/approve`, {});
+  }
+
+  resendDocument(id: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${id}/resend-document`, {});
+  }
+
+  downloadProposal(id: number): Observable<Blob> {
+    return this.http.get(`${this.documentApiUrl}/quotes/${id}/pdf`, {
+      responseType: 'blob',
+    });
   }
 }

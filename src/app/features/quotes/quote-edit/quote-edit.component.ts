@@ -65,6 +65,8 @@ export class QuoteEditComponent implements OnInit {
   isLoadingData = true;
   isSubmitting = false;
   isCalculating = false;
+  isActionProcessing = false;
+  isApproved = false;
   quoteDetails?: QuoteDetails;
 
   customerForm: FormGroup = this.fb.group({
@@ -103,6 +105,10 @@ export class QuoteEditComponent implements OnInit {
     this.quoteId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadQuoteData();
 
+    this.customerForm.valueChanges.subscribe(() => {
+      this.resetCalculationState();
+    });
+
     this.filteredVehicles$ = this.modelSearchControl.valueChanges.pipe(
       debounceTime(400),
       distinctUntilChanged(),
@@ -130,10 +136,15 @@ export class QuoteEditComponent implements OnInit {
     this.quoteService.getQuoteById(this.quoteId).subscribe({
       next: (quote: QuoteDetails) => {
         this.quoteDetails = quote;
-        this.customerForm.patchValue({
-          customerName: quote.customerName,
-          customerCnpj: quote.customerCnpj,
-        });
+        this.isApproved = quote.status === 'APPROVED';
+
+        this.customerForm.patchValue(
+          {
+            customerName: quote.customerName,
+            customerCnpj: quote.customerCnpj,
+          },
+          { emitEvent: false },
+        );
 
         this.vehicles = quote.vehicles.map((v) => ({
           licensePlate: v.licensePlate,
@@ -152,6 +163,18 @@ export class QuoteEditComponent implements OnInit {
     });
   }
 
+  resetCalculationState() {
+    if (this.quoteDetails?.totalPremium || this.isApproved) {
+      if (this.quoteDetails) {
+        this.quoteDetails.totalPremium = null;
+      }
+      this.isApproved = false;
+      console.log(
+        'Cotação alterada! Prêmio invalidado, necessário recalcular.',
+      );
+    }
+  }
+
   onCnpjInput(event: Event) {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
@@ -164,6 +187,7 @@ export class QuoteEditComponent implements OnInit {
     this.customerForm
       .get('customerCnpj')
       ?.setValue(value, { emitEvent: false });
+    this.resetCalculationState();
   }
 
   onPlateInput(event: Event) {
@@ -199,11 +223,13 @@ export class QuoteEditComponent implements OnInit {
       this.vehicleForm.reset({ coverageLimit: 1000000 });
       this.modelSearchControl.reset();
       this.availableYears = [];
+      this.resetCalculationState();
     }
   }
 
   removeVehicle(index: number) {
     this.vehicles = this.vehicles.filter((_, i) => i !== index);
+    this.resetCalculationState();
   }
 
   onSubmit(shouldCalculate: boolean) {
@@ -238,5 +264,62 @@ export class QuoteEditComponent implements OnInit {
         });
       }
     }
+  }
+
+  onApproveQuote() {
+    if (
+      confirm('Confirma a aprovação desta cotação? A proposta será gerada.')
+    ) {
+      this.isActionProcessing = true;
+      this.quoteService.approveQuote(this.quoteId).subscribe({
+        next: () => {
+          alert('Cotação aprovada com sucesso! O documento está sendo gerado.');
+          this.loadQuoteData();
+          this.isActionProcessing = false;
+        },
+        error: (err) => {
+          console.error('Erro ao aprovar cotação', err);
+          alert('Erro ao aprovar cotação.');
+          this.isActionProcessing = false;
+        },
+      });
+    }
+  }
+
+  onResendEmail() {
+    this.isActionProcessing = true;
+    this.quoteService.resendDocument(this.quoteId).subscribe({
+      next: () => {
+        alert(
+          'Comando enviado! O e-mail com a proposta será reenviado em instantes.',
+        );
+        this.isActionProcessing = false;
+      },
+      error: () => {
+        alert('Erro ao solicitar reenvio do documento.');
+        this.isActionProcessing = false;
+      },
+    });
+  }
+
+  onDownloadProposal() {
+    this.isActionProcessing = true;
+    this.quoteService.downloadProposal(this.quoteId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Proposta_Frota_${this.quoteId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        this.isActionProcessing = false;
+      },
+      error: () => {
+        alert('O PDF ainda está sendo gerado pelo motor ou ocorreu um erro.');
+        this.isActionProcessing = false;
+      },
+    });
   }
 }
