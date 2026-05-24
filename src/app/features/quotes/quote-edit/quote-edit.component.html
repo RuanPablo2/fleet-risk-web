@@ -21,300 +21,288 @@
       <mat-spinner diameter="40"></mat-spinner>
     </div>
   } @else {
-    <mat-stepper linear #stepper class="form-card">
-      <mat-step [stepControl]="customerForm">
-        <form [formGroup]="customerForm">
-          <ng-template matStepLabel>Dados do Segurado</ng-template>
+    <div class="form-card mb-6">
+      <div class="card-header">
+        <h2 class="card-title">Dados do Segurado</h2>
+      </div>
 
-          <div class="step-content">
-            <div class="form-group">
-              <label class="form-label">Nome / Razão Social</label>
-              <input
-                type="text"
-                formControlName="customerName"
-                class="form-input"
-              />
-            </div>
+      <div class="step-content">
+        <form
+          [formGroup]="customerForm"
+          class="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <div class="form-group">
+            <label class="form-label">Nome / Razão Social</label>
+            <input
+              type="text"
+              formControlName="customerName"
+              class="form-input"
+            />
+          </div>
 
-            <div class="form-group">
-              <label class="form-label">CNPJ</label>
-              <input
-                type="text"
-                formControlName="customerCnpj"
-                class="form-input"
-                maxlength="18"
-                (input)="onCnpjInput($event)"
-              />
-            </div>
-
-            <div class="step-actions flex-end">
-              <button
-                mat-flat-button
-                color="primary"
-                matStepperNext
-                type="button"
-              >
-                Avançar para Veículos
-              </button>
-            </div>
+          <div class="form-group">
+            <label class="form-label">CNPJ</label>
+            <input
+              type="text"
+              formControlName="customerCnpj"
+              class="form-input"
+              maxlength="18"
+              (input)="onCnpjInput($event)"
+            />
           </div>
         </form>
-      </mat-step>
+      </div>
+    </div>
 
-      <mat-step>
-        <ng-template matStepLabel>Montagem da Frota</ng-template>
-        <div class="step-content">
-          <form
-            [formGroup]="vehicleForm"
-            (ngSubmit)="addVehicle()"
-            class="vehicle-form-grid"
-          >
-            <div class="form-group">
-              <label class="form-label">Placa</label>
-              <input
-                type="text"
-                formControlName="licensePlate"
-                class="form-input"
-                maxlength="8"
-                (input)="onPlateInput($event)"
-              />
-            </div>
+    <div class="form-card">
+      <div class="card-header">
+        <h2 class="card-title">Composição da Frota</h2>
+      </div>
 
-            <div class="form-group col-span-2">
-              <label class="form-label">Buscar Modelo (FIPE)</label>
-              <input
-                type="text"
-                [formControl]="modelSearchControl"
-                class="form-input"
-                [matAutocomplete]="auto"
-              />
-              <mat-autocomplete
-                #auto="matAutocomplete"
-                [displayWith]="displayVehicle"
-                (optionSelected)="onVehicleSelected($event.option.value)"
+      <div class="step-content">
+        <form
+          [formGroup]="vehicleForm"
+          (ngSubmit)="addVehicle()"
+          class="vehicle-form-grid"
+        >
+          <div class="form-group">
+            <label class="form-label">Placa</label>
+            <input
+              type="text"
+              formControlName="licensePlate"
+              class="form-input"
+              maxlength="8"
+              (input)="onPlateInput($event)"
+            />
+          </div>
+
+          <div class="form-group col-span-2">
+            <label class="form-label">Buscar Modelo (FIPE)</label>
+            <input
+              type="text"
+              [formControl]="modelSearchControl"
+              class="form-input"
+              [matAutocomplete]="auto"
+            />
+            <mat-autocomplete
+              #auto="matAutocomplete"
+              [displayWith]="displayVehicle"
+              (optionSelected)="onVehicleSelected($event.option.value)"
+            >
+              @for (
+                vehicle of filteredVehicles$ | async;
+                track vehicle.fipeCode
+              ) {
+                <mat-option [value]="vehicle"
+                  >{{ vehicle.name }} (FIPE: {{ vehicle.fipeCode }})</mat-option
+                >
+              }
+            </mat-autocomplete>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ano Modelo</label>
+            <select
+              formControlName="yearId"
+              class="form-input"
+              [class.opacity-50]="availableYears.length === 0 || isLoadingYears"
+            >
+              <option value="" disabled selected>
+                {{ isLoadingYears ? "Carregando..." : "Selecione..." }}
+              </option>
+              @for (year of availableYears; track year.code) {
+                <option [value]="year.code">{{ year.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cobertura (R$)</label>
+            <input
+              type="number"
+              formControlName="coverageLimit"
+              class="form-input"
+            />
+          </div>
+
+          <div class="add-vehicle-action">
+            <button
+              mat-stroked-button
+              color="primary"
+              type="submit"
+              [disabled]="vehicleForm.invalid"
+            >
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </form>
+
+        <div class="vehicles-table-container">
+          <table mat-table [dataSource]="vehicles" class="fleet-table">
+            <ng-container matColumnDef="licensePlate">
+              <th mat-header-cell *matHeaderCellDef>Placa</th>
+              <td
+                mat-cell
+                *matCellDef="let v"
+                class="font-medium text-gray-800"
               >
-                @for (
-                  vehicle of filteredVehicles$ | async;
-                  track vehicle.fipeCode
-                ) {
-                  <mat-option [value]="vehicle"
-                    >{{ vehicle.name }} (FIPE:
-                    {{ vehicle.fipeCode }})</mat-option
-                  >
-                }
-              </mat-autocomplete>
-            </div>
+                {{ v.licensePlate }}
+              </td>
+            </ng-container>
 
-            <div class="form-group">
-              <label class="form-label">Ano Modelo</label>
-              <select
-                formControlName="yearId"
-                class="form-input"
-                [class.opacity-50]="
-                  availableYears.length === 0 || isLoadingYears
-                "
+            <ng-container matColumnDef="fipeCode">
+              <th mat-header-cell *matHeaderCellDef>FIPE</th>
+              <td mat-cell *matCellDef="let v" class="text-gray-600">
+                {{ v.fipeCode }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="yearId">
+              <th mat-header-cell *matHeaderCellDef>Ano</th>
+              <td mat-cell *matCellDef="let v" class="text-gray-600">
+                {{ v.yearId }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="coverageLimit">
+              <th mat-header-cell *matHeaderCellDef>Cobertura</th>
+              <td mat-cell *matCellDef="let v" class="text-gray-600">
+                {{ v.coverageLimit | currency: "BRL" : "symbol" }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="text-right">
+                Remover
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let v; let i = index"
+                class="text-right"
               >
-                <option value="" disabled selected>
-                  {{ isLoadingYears ? "Carregando..." : "Selecione..." }}
-                </option>
-                @for (year of availableYears; track year.code) {
-                  <option [value]="year.code">{{ year.name }}</option>
-                }
-              </select>
-            </div>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  type="button"
+                  (click)="removeVehicle(i)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
 
-            <div class="form-group">
-              <label class="form-label">Cobertura (R$)</label>
-              <input
-                type="number"
-                formControlName="coverageLimit"
-                class="form-input"
-              />
-            </div>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns"
+              class="hover:bg-gray-50 transition-colors"
+            ></tr>
+          </table>
+        </div>
 
-            <div class="add-vehicle-action">
+        @if (quoteDetails?.totalPremium) {
+          <div class="premium-summary-container">
+            <div class="premium-summary-content">
+              <p class="premium-summary-label">Prêmio Total da Frota</p>
+              <p class="premium-summary-value">
+                {{ quoteDetails?.totalPremium | currency: "BRL" : "symbol" }}
+              </p>
+            </div>
+          </div>
+        }
+
+        <div class="step-actions split-actions">
+          <div></div>
+
+          @if (!isApproved) {
+            <div class="flex gap-4 items-center">
+              @if (isCalculating) {
+                <div class="text-blue-600 font-medium flex items-center gap-2">
+                  <mat-spinner diameter="20"></mat-spinner>
+                  Aguardando Motor Atuarial...
+                </div>
+              }
+
               <button
                 mat-stroked-button
                 color="primary"
-                type="submit"
-                [disabled]="vehicleForm.invalid"
+                type="button"
+                (click)="onSubmit(false)"
+                [disabled]="
+                  vehicles.length === 0 ||
+                  isSubmitting ||
+                  isCalculating ||
+                  isActionProcessing ||
+                  customerForm.invalid
+                "
               >
-                <mat-icon>add</mat-icon>
+                Salvar Alterações
+              </button>
+
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                (click)="onSubmit(true)"
+                [disabled]="
+                  vehicles.length === 0 ||
+                  isSubmitting ||
+                  isCalculating ||
+                  isActionProcessing ||
+                  customerForm.invalid
+                "
+              >
+                <mat-icon>calculate</mat-icon> Recalcular Frota
+              </button>
+
+              @if (quoteDetails?.totalPremium) {
+                <button
+                  mat-flat-button
+                  color="accent"
+                  type="button"
+                  (click)="onApproveQuote()"
+                  [disabled]="
+                    isSubmitting ||
+                    isCalculating ||
+                    isActionProcessing ||
+                    customerForm.invalid
+                  "
+                >
+                  <mat-icon>check_circle</mat-icon> Aprovar Cotação
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="flex gap-4 items-center">
+              <div
+                class="text-green-700 font-medium flex items-center gap-2 mr-4 bg-green-50 px-3 py-1 rounded-full border border-green-200"
+              >
+                <mat-icon class="text-sm">verified</mat-icon> Proposta gerada
+              </div>
+
+              <button
+                mat-stroked-button
+                color="primary"
+                type="button"
+                (click)="onResendEmail()"
+                [disabled]="isActionProcessing"
+              >
+                <mat-icon>send</mat-icon> Reenviar E-mail
+              </button>
+
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                (click)="onDownloadProposal()"
+                [disabled]="isActionProcessing"
+              >
+                <mat-icon>download</mat-icon> Baixar Proposta (PDF)
               </button>
             </div>
-          </form>
-
-          <div class="vehicles-table-container">
-            <table mat-table [dataSource]="vehicles" class="fleet-table">
-              <ng-container matColumnDef="licensePlate">
-                <th mat-header-cell *matHeaderCellDef>Placa</th>
-                <td
-                  mat-cell
-                  *matCellDef="let v"
-                  class="font-medium text-gray-800"
-                >
-                  {{ v.licensePlate }}
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="fipeCode">
-                <th mat-header-cell *matHeaderCellDef>FIPE</th>
-                <td mat-cell *matCellDef="let v" class="text-gray-600">
-                  {{ v.fipeCode }}
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="yearId">
-                <th mat-header-cell *matHeaderCellDef>Ano</th>
-                <td mat-cell *matCellDef="let v" class="text-gray-600">
-                  {{ v.yearId }}
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="coverageLimit">
-                <th mat-header-cell *matHeaderCellDef>Cobertura</th>
-                <td mat-cell *matCellDef="let v" class="text-gray-600">
-                  {{ v.coverageLimit | currency: "BRL" : "symbol" }}
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef class="text-right">
-                  Remover
-                </th>
-                <td
-                  mat-cell
-                  *matCellDef="let v; let i = index"
-                  class="text-right"
-                >
-                  <button
-                    mat-icon-button
-                    color="warn"
-                    type="button"
-                    (click)="removeVehicle(i)"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedColumns"
-                class="hover:bg-gray-50 transition-colors"
-              ></tr>
-            </table>
-          </div>
-
-          @if (quoteDetails?.totalPremium) {
-            <div class="premium-summary-container">
-              <div class="premium-summary-content">
-                <p class="premium-summary-label">Prêmio Total da Frota</p>
-                <p class="premium-summary-value">
-                  {{ quoteDetails?.totalPremium | currency: "BRL" : "symbol" }}
-                </p>
-              </div>
-            </div>
           }
-
-          <div class="step-actions split-actions">
-            <button
-              mat-button
-              matStepperPrevious
-              type="button"
-              [disabled]="isSubmitting || isCalculating || isActionProcessing"
-            >
-              Voltar
-            </button>
-
-            @if (!isApproved) {
-              <div class="flex gap-4 items-center">
-                @if (isCalculating) {
-                  <div
-                    class="text-blue-600 font-medium flex items-center gap-2"
-                  >
-                    <mat-spinner diameter="20"></mat-spinner>
-                    Aguardando Motor Atuarial...
-                  </div>
-                }
-
-                <button
-                  mat-stroked-button
-                  color="primary"
-                  type="button"
-                  (click)="onSubmit(false)"
-                  [disabled]="
-                    vehicles.length === 0 ||
-                    isSubmitting ||
-                    isCalculating ||
-                    isActionProcessing
-                  "
-                >
-                  Salvar Alterações
-                </button>
-
-                <button
-                  mat-flat-button
-                  color="primary"
-                  type="button"
-                  (click)="onSubmit(true)"
-                  [disabled]="
-                    vehicles.length === 0 ||
-                    isSubmitting ||
-                    isCalculating ||
-                    isActionProcessing
-                  "
-                >
-                  <mat-icon>calculate</mat-icon> Recalcular Frota
-                </button>
-
-                @if (quoteDetails?.totalPremium) {
-                  <button
-                    mat-flat-button
-                    color="accent"
-                    type="button"
-                    (click)="onApproveQuote()"
-                    [disabled]="
-                      isSubmitting || isCalculating || isActionProcessing
-                    "
-                  >
-                    <mat-icon>check_circle</mat-icon> Aprovar Cotação
-                  </button>
-                }
-              </div>
-            } @else {
-              <div class="flex gap-4 items-center">
-                <div
-                  class="text-green-700 font-medium flex items-center gap-2 mr-4 bg-green-50 px-3 py-1 rounded-full border border-green-200"
-                >
-                  <mat-icon class="text-sm">verified</mat-icon> Proposta gerada
-                </div>
-
-                <button
-                  mat-stroked-button
-                  color="primary"
-                  type="button"
-                  (click)="onResendEmail()"
-                  [disabled]="isActionProcessing"
-                >
-                  <mat-icon>send</mat-icon> Reenviar E-mail
-                </button>
-
-                <button
-                  mat-flat-button
-                  color="primary"
-                  type="button"
-                  (click)="onDownloadProposal()"
-                  [disabled]="isActionProcessing"
-                >
-                  <mat-icon>download</mat-icon> Baixar Proposta (PDF)
-                </button>
-              </div>
-            }
-          </div>
         </div>
-      </mat-step>
-    </mat-stepper>
+      </div>
+    </div>
   }
 </div>

@@ -32,6 +32,14 @@
   @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
 }
 
+.card-header {
+  @apply p-4 border-b border-gray-100 bg-gray-50/50;
+}
+
+.card-title {
+  @apply text-lg font-bold text-gray-800 m-0;
+}
+
 .step-content {
   @apply p-4 flex flex-col gap-6;
 }
