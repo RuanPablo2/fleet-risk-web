@@ -150,6 +150,18 @@
               </td>
             </ng-container>
 
+            <ng-container matColumnDef="modelName">
+              <th mat-header-cell *matHeaderCellDef>Modelo</th>
+              <td
+                mat-cell
+                *matCellDef="let v"
+                class="text-gray-700 font-medium truncate max-w-[200px]"
+                [title]="v.modelName || ''"
+              >
+                {{ v.modelName || "N/A" }}
+              </td>
+            </ng-container>
+
             <ng-container matColumnDef="fipeCode">
               <th mat-header-cell *matHeaderCellDef>FIPE</th>
               <td mat-cell *matCellDef="let v" class="text-gray-600">

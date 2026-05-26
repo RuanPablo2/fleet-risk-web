@@ -83,6 +83,7 @@ export class QuoteEditComponent implements OnInit {
       [Validators.required, Validators.minLength(8), Validators.maxLength(8)],
     ],
     fipeCode: ['', Validators.required],
+    modelName: [''],
     yearId: ['', Validators.required],
     coverageLimit: [1000000, [Validators.required, Validators.min(1)]],
   });
@@ -95,6 +96,7 @@ export class QuoteEditComponent implements OnInit {
   vehicles: VehicleQuote[] = [];
   displayedColumns: string[] = [
     'licensePlate',
+    'modelName',
     'fipeCode',
     'yearId',
     'coverageLimit',
@@ -150,8 +152,9 @@ export class QuoteEditComponent implements OnInit {
           { emitEvent: false },
         );
 
-        this.vehicles = quote.vehicles.map((v) => ({
+        this.vehicles = quote.vehicles.map((v: any) => ({
           licensePlate: v.licensePlate,
+          modelName: v.modelName || 'Modelo não informado',
           fipeCode: v.fipeCode,
           yearId: v.yearId,
           coverageLimit: v.coverageLimit,
@@ -209,15 +212,24 @@ export class QuoteEditComponent implements OnInit {
   }
 
   onVehicleSelected(vehicle: VehicleSearchResult) {
-    this.vehicleForm.patchValue({ fipeCode: vehicle.fipeCode, yearId: '' });
+    this.vehicleForm.patchValue({
+      fipeCode: vehicle.fipeCode,
+      modelName: vehicle.name,
+      yearId: '',
+    });
+
     this.availableYears = [];
     this.isLoadingYears = true;
+
     this.vehicleService.getAvailableYears(vehicle.fipeCode).subscribe({
       next: (years) => {
         this.availableYears = years;
         this.isLoadingYears = false;
       },
-      error: () => (this.isLoadingYears = false),
+      error: (err) => {
+        console.error('Erro ao buscar anos da FIPE:', err);
+        this.isLoadingYears = false;
+      },
     });
   }
 

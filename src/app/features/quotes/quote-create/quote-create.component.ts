@@ -68,6 +68,7 @@ export class QuoteCreateComponent implements OnInit {
       [Validators.required, Validators.minLength(8), Validators.maxLength(8)],
     ],
     fipeCode: ['', Validators.required],
+    modelName: [''],
     yearId: ['', Validators.required],
     coverageLimit: [1000000, [Validators.required, Validators.min(1)]],
   });
@@ -81,6 +82,7 @@ export class QuoteCreateComponent implements OnInit {
   vehicles: VehicleQuote[] = [];
   displayedColumns: string[] = [
     'licensePlate',
+    'modelName',
     'fipeCode',
     'yearId',
     'coverageLimit',
@@ -145,6 +147,7 @@ export class QuoteCreateComponent implements OnInit {
   onVehicleSelected(vehicle: VehicleSearchResult) {
     this.vehicleForm.patchValue({
       fipeCode: vehicle.fipeCode,
+      modelName: vehicle.name,
       yearId: '',
     });
 

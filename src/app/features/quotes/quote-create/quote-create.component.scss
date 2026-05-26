@@ -32,6 +32,14 @@
   @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
 }
 
+.card-header {
+  @apply p-4 border-b border-gray-100 bg-gray-50/50;
+}
+
+.card-title {
+  @apply text-lg font-bold text-gray-800 m-0;
+}
+
 .step-content {
   @apply p-4 flex flex-col gap-6;
 }
@@ -78,7 +86,7 @@
   }
 
   td.mat-cell {
-    @apply border-b border-gray-100 px-4 py-2;
+    @apply border-b border-gray-100 px-4 py-2 max-w-[200px] truncate;
   }
 }
 
@@ -88,10 +96,6 @@
 
 .step-actions {
   @apply mt-6 pt-4 border-t border-gray-100 flex;
-}
-
-.flex-end {
-  @apply justify-end;
 }
 
 .split-actions {
