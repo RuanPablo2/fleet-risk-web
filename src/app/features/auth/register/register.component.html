@@ -12,12 +12,14 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">CNPJ (Somente números)</label>
+        <label class="form-label">CNPJ</label>
         <input
           type="text"
           formControlName="cnpj"
           class="form-input"
-          maxlength="14"
+          maxlength="18"
+          (input)="onCnpjInput($event)"
+          placeholder="00.000.000/0000-00"
         />
       </div>
 
