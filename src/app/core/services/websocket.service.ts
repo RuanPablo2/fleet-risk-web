@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Client, Message } from '@stomp/stompjs';
 import { Observable, Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,7 @@ export class WebsocketService {
 
   constructor() {
     this.client = new Client({
-      brokerURL: 'ws://localhost:8081/ws/quotes',
+      brokerURL: environment.wsUrl,
       reconnectDelay: 5000,
       debug: (msg: string) => console.log('[WebSocket]', msg),
     });
