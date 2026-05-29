@@ -5,6 +5,26 @@
       <p class="brand-subtitle">Portal do Corretor</p>
     </div>
 
+    <div class="demo-alert">
+      <mat-icon class="alert-icon">info</mat-icon>
+      <p>
+        O banco de dados é <strong>resetado a cada 12 horas</strong> para manter
+        o ambiente de demonstração limpo e seguro.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="auth-button demo-button"
+      (click)="loginAsDemo()"
+    >
+      Entrar com Conta de Demonstração
+    </button>
+
+    <div class="auth-divider">
+      <span>ou acesse sua corretora</span>
+    </div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
       <div class="form-group">
         <label class="form-label">E-mail</label>

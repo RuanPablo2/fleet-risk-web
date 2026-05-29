@@ -223,6 +223,26 @@
           </div>
         }
 
+        @if (isApproved) {
+          <div
+            class="w-full mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex items-start gap-3"
+          >
+            <mat-icon class="text-indigo-600 mt-0.5">lightbulb</mat-icon>
+            <p class="text-sm text-indigo-900 m-0">
+              <strong>Quer ver a mensageria na prática?</strong> Crie uma nova
+              conta no sistema utilizando um e-mail do
+              <a
+                href="https://temp-mail.org/pt/"
+                target="_blank"
+                class="font-bold underline hover:text-indigo-700 transition-colors"
+                >temp-mail.org</a
+              >
+              e aprove uma cotação para receber a proposta real em PDF por
+              e-mail.
+            </p>
+          </div>
+        }
+
         <div class="step-actions split-actions">
           <div></div>
 

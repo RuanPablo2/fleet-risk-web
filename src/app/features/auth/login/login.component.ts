@@ -7,11 +7,12 @@ import {
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, MatIconModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -36,5 +37,13 @@ export class LoginComponent {
         },
       });
     }
+  }
+
+  loginAsDemo() {
+    this.loginForm.patchValue({
+      email: 'demo@fleetrisk.com',
+      password: 'demo@1234',
+    });
+    this.onSubmit();
   }
 }
