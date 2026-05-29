@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Client, Message } from '@stomp/stompjs';
 import { Observable, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import SockJS from 'sockjs-client';
 
 @Injectable({
   providedIn: 'root',
@@ -12,14 +13,15 @@ export class WebsocketService {
 
   constructor() {
     this.client = new Client({
-      brokerURL: environment.wsUrl,
+      webSocketFactory: () => new SockJS(environment.wsUrl),
+
       reconnectDelay: 5000,
       debug: (msg: string) => console.log('[WebSocket]', msg),
     });
 
     this.client.onConnect = () => {
       this.connected = true;
-      console.log('🔌 Conectado ao WebSocket do Motor Atuarial!');
+      console.log('🔌 Conectado ao WebSocket do Motor Atuarial (Via SockJS)!');
     };
 
     this.client.activate();
