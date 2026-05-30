@@ -6,9 +6,25 @@
 ![RxJS](https://img.shields.io/badge/RxJS-Event_Streams-B3083F?style=for-the-badge&logo=reactivex)
 ![WebSocket](https://img.shields.io/badge/WebSocket-STOMP-black?style=for-the-badge&logo=socket.io)
 
-O **FleetRisk Web** é o frontend principal do ecossistema de subscrição de seguros para frotas comerciais. Desenvolvido como uma Single Page Application (SPA) de alta performance utilizando Angular 19, o sistema oferece à corretora uma experiência fluida para precificação de frotas complexas, suportada por WebSockets e arquitetura orientada a eventos.
+O **FleetRisk Web** é o frontend principal do ecossistema de subscrição de seguros para frotas comerciais. Desenvolvido como uma Single Page Application (SPA) de alta performance utilizando Angular 19, o sistema oferece à corretora uma experiência fluida para precificação de frotas, suportada por WebSockets, arquitetura orientada a eventos e um design focado na conversão e produtividade do usuário.
 
 ---
+
+## 🚀 Acesse o projeto em produção
+
+- **Aplicação Front-end:** https://fleetrisk.netlify.app/login
+
+- **Documentação da API (Swagger):** https://fleetrisk-ruanpablo2.duckdns.org/swagger-ui/index.html
+
+## 🔥 Highlights Técnicos (diferenciais do projeto)
+
+- **Zero-Friction Demo:** Interface de login projetada com a funcionalidade One-Click Demo, permitindo que recrutadores e avaliadores técnicos testem o sistema instantaneamente sem a necessidade de preencher formulários de cadastro.
+
+- **UX Educativa:** Banners contextuais integrados na interface (como a dica de uso do Temp-Mail) que guiam o avaliador a testar as integrações assíncronas do backend (envio de e-mails via RabbitMQ) diretamente pela UI.
+
+- **Mobile-First & Layout Adaptativo:** Utilização do `BreakpointObserver` do Angular CDK para transformar dinamicamente a barra de navegação em uma gaveta flutuante (`drawer`) em dispositivos móveis. Tabelas densas de dados atuariais foram otimizadas com rolagem horizontal contida, garantindo que o painel da corretora seja 100% responsivo em qualquer formato de tela.
+
+- **Conexão Real-Time Resiliente:** Integração do cliente STOMP com SockJS para garantir que a conexão WebSocket "cave um túnel" HTTP seguro por debaixo de proxies reversos e API Gateways da nuvem, garantindo atualizações de prêmio na tela sem falhas de CORS.
 
 ## 🚀 Funcionalidades Principais & UX
 
