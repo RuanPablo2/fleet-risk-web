@@ -75,11 +75,12 @@
 }
 
 .vehicles-table-container {
-  @apply border border-gray-200 rounded-lg overflow-hidden;
+  @apply border border-gray-200 rounded-lg overflow-x-auto;
 }
 
 .fleet-table {
   @apply w-full bg-white;
+  min-width: 600px;
 
   th.mat-header-cell {
     @apply text-gray-500 font-semibold uppercase text-xs tracking-wider border-b border-gray-200 bg-gray-50/50 px-4;
@@ -95,9 +96,17 @@
 }
 
 .step-actions {
-  @apply mt-6 pt-4 border-t border-gray-100 flex;
+  @apply mt-6 pt-4 border-t border-gray-100 flex flex-col md:flex-row gap-4;
 }
 
 .split-actions {
-  @apply justify-between;
+  @apply md:justify-between;
+}
+
+.step-actions .flex.gap-4 {
+  @apply flex-col md:flex-row w-full md:w-auto;
+
+  button {
+    @apply w-full md:w-auto;
+  }
 }

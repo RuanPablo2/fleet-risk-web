@@ -1,5 +1,10 @@
 <mat-sidenav-container class="layout-container">
-  <mat-sidenav mode="side" opened class="sidebar">
+  <mat-sidenav
+    #drawer
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+    class="sidebar"
+  >
     <div class="sidebar-header">
       <mat-icon class="brand-icon" color="primary">directions_car</mat-icon>
       <span class="brand-title">FleetRisk</span>
@@ -11,12 +16,18 @@
         routerLink="/quotes"
         routerLinkActive="active-link"
         [routerLinkActiveOptions]="{ exact: true }"
+        (click)="drawer.mode === 'over' ? drawer.close() : null"
       >
         <mat-icon matListItemIcon color="primary">dashboard</mat-icon>
         <div matListItemTitle>Dashboard</div>
       </a>
 
-      <a mat-list-item routerLink="/quotes/new" routerLinkActive="active-link">
+      <a
+        mat-list-item
+        routerLink="/quotes/new"
+        routerLinkActive="active-link"
+        (click)="drawer.mode === 'over' ? drawer.close() : null"
+      >
         <mat-icon matListItemIcon color="primary">add_circle</mat-icon>
         <div matListItemTitle>Nova Cotação</div>
       </a>
@@ -32,6 +43,12 @@
 
   <mat-sidenav-content class="main-wrapper">
     <mat-toolbar class="topbar">
+      @if (isHandset$ | async) {
+        <button mat-icon-button (click)="drawer.toggle()" class="mr-2">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+
       <span class="topbar-title">Portal do Corretor</span>
       <span class="spacer"></span>
       <button mat-icon-button color="primary">

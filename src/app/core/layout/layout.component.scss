@@ -57,5 +57,5 @@
 }
 
 .content-area {
-  @apply flex-1 p-8 overflow-y-auto bg-gray-50;
+  @apply flex-1 p-4 md:p-8 overflow-y-auto bg-gray-50;
 }
