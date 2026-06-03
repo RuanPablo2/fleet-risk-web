@@ -4,32 +4,21 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
-  FormControl,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { CurrencyPipe, AsyncPipe } from '@angular/common';
-import { Observable, of } from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  switchMap,
-  catchError,
-} from 'rxjs/operators';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+
 import {
   QuoteService,
   CreateQuoteRequest,
   VehicleQuote,
 } from '../../../core/services/quote.service';
-import {
-  VehicleService,
-  VehicleSearchResult,
-  VehicleYear,
-} from '../../../core/services/vehicle.service';
+
+import { QuoteVehicleDialogComponent } from '../quote-vehicle-dialog/quote-vehicle-dialog.component';
 
 @Component({
   selector: 'app-quote-create',
@@ -41,9 +30,7 @@ import {
     MatButtonModule,
     MatIconModule,
     MatTableModule,
-    MatAutocompleteModule,
-    CurrencyPipe,
-    AsyncPipe,
+    MatDialogModule,
   ],
   templateUrl: './quote-create.component.html',
   styleUrl: './quote-create.component.scss',
@@ -51,8 +38,8 @@ import {
 export class QuoteCreateComponent implements OnInit {
   private fb = inject(FormBuilder);
   private quoteService = inject(QuoteService);
-  private vehicleService = inject(VehicleService);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   customerForm: FormGroup = this.fb.group({
     customerName: ['', [Validators.required, Validators.minLength(3)]],
@@ -62,118 +49,72 @@ export class QuoteCreateComponent implements OnInit {
     ],
   });
 
-  vehicleForm: FormGroup = this.fb.group({
-    licensePlate: [
-      '',
-      [Validators.required, Validators.minLength(8), Validators.maxLength(8)],
-    ],
-    fipeCode: ['', Validators.required],
-    modelName: [''],
-    yearId: ['', Validators.required],
-    coverageLimit: [1000000, [Validators.required, Validators.min(1)]],
-  });
-
-  modelSearchControl = new FormControl('');
-  filteredVehicles$!: Observable<VehicleSearchResult[]>;
-
-  availableYears: VehicleYear[] = [];
-  isLoadingYears = false;
-
   vehicles: VehicleQuote[] = [];
+
   displayedColumns: string[] = [
     'licensePlate',
     'modelName',
     'fipeCode',
     'yearId',
-    'coverageLimit',
+    'coverages',
     'actions',
   ];
+
   isSubmitting = false;
 
-  ngOnInit() {
-    this.filteredVehicles$ = this.modelSearchControl.valueChanges.pipe(
-      debounceTime(400),
-      distinctUntilChanged(),
-      switchMap((query) => {
-        if (query && query.length >= 3) {
-          return this.vehicleService
-            .searchModels(query)
-            .pipe(catchError(() => of([])));
-        }
-        return of([]);
-      }),
-    );
-  }
+  ngOnInit() {}
 
   onCnpjInput(event: Event) {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
-
-    if (value.length > 14) {
-      value = value.slice(0, 14);
-    }
-
+    if (value.length > 14) value = value.slice(0, 14);
     value = value.replace(/^(\d{2})(\d)/, '$1.$2');
     value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
     value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
     value = value.replace(/(\d{4})(\d)/, '$1-$2');
-
     input.value = value;
     this.customerForm
       .get('customerCnpj')
       ?.setValue(value, { emitEvent: false });
   }
 
-  onPlateInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    let value = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-
-    if (value.length > 7) {
-      value = value.slice(0, 7);
-    }
-
-    if (value.length > 3) {
-      value = value.replace(/^([A-Z]{3})([0-9A-Z]{0,4})/, '$1-$2');
-    }
-
-    input.value = value;
-    this.vehicleForm.get('licensePlate')?.setValue(value, { emitEvent: false });
-  }
-
-  displayVehicle(vehicle: VehicleSearchResult): string {
-    return vehicle ? `${vehicle.name} (FIPE: ${vehicle.fipeCode})` : '';
-  }
-
-  onVehicleSelected(vehicle: VehicleSearchResult) {
-    this.vehicleForm.patchValue({
-      fipeCode: vehicle.fipeCode,
-      modelName: vehicle.name,
-      yearId: '',
+  openAddVehicleDialog() {
+    const dialogRef = this.dialog.open(QuoteVehicleDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      disableClose: true,
     });
 
-    this.availableYears = [];
-    this.isLoadingYears = true;
-
-    this.vehicleService.getAvailableYears(vehicle.fipeCode).subscribe({
-      next: (years) => {
-        this.availableYears = years;
-        this.isLoadingYears = false;
-      },
-      error: (err) => {
-        console.error('Erro ao buscar anos da FIPE:', err);
-        this.isLoadingYears = false;
-      },
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.vehicles && result.vehicles.length > 0) {
+        this.vehicles = [...this.vehicles, ...result.vehicles];
+      }
     });
   }
 
-  addVehicle() {
-    if (this.vehicleForm.valid) {
-      this.vehicles = [...this.vehicles, this.vehicleForm.value];
+  editVehicle(index: number) {
+    const dialogRef = this.dialog.open(QuoteVehicleDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        vehicle: this.vehicles[index],
+        index: index,
+      },
+    });
 
-      this.vehicleForm.reset({ coverageLimit: 1000000 });
-      this.modelSearchControl.reset();
-      this.availableYears = [];
-    }
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (
+        result &&
+        result.vehicles &&
+        result.vehicles.length > 0 &&
+        result.isEdit
+      ) {
+        this.vehicles[result.editIndex] = result.vehicles[0];
+
+        this.vehicles = [...this.vehicles];
+      }
+    });
   }
 
   removeVehicle(index: number) {

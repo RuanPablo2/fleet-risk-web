@@ -3,6 +3,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export enum CoverageType {
+  CASCO = 'CASCO',
+  RCF_DM = 'RCF_DM',
+  RCF_DC = 'RCF_DC',
+  RCF_DMO = 'RCF_DMO',
+  APP_MORTE = 'APP_MORTE',
+  APP_INVALIDEZ = 'APP_INVALIDEZ',
+}
+
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
@@ -20,11 +29,18 @@ export interface QuoteResponse {
   status: string;
 }
 
+export interface VehicleCoverageRequest {
+  type: CoverageType;
+  fipePercentage: number | null;
+  limitAmount: number | null;
+}
+
 export interface VehicleQuote {
   licensePlate: string;
   fipeCode: string;
   yearId: string;
-  coverageLimit: number;
+  modelName?: string;
+  coverages: VehicleCoverageRequest[];
 }
 
 export interface CreateQuoteRequest {
@@ -40,15 +56,23 @@ export interface QuoteKpiResponse {
   approved: number;
 }
 
+export interface VehicleCoverageDetails {
+  id?: number;
+  type: CoverageType;
+  fipePercentage: number | null;
+  limitAmount: number | null;
+  premiumAmount: number | null;
+}
+
 export interface QuoteVehicleDetails {
   id: number;
   licensePlate: string;
   fipeCode: string;
   yearId: string;
-  coverageLimit: number;
   modelName: string;
   fipeValue: number;
   calculatedPremium: number | null;
+  coverages: VehicleCoverageDetails[];
 }
 
 export interface QuoteDetails {

@@ -1,0 +1,191 @@
+<h2 mat-dialog-title class="dialog-title">
+  @if (isEditMode) {
+    Editar Veículo
+  } @else {
+    Adicionar Veículos em Lote
+  }
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="flex flex-col gap-6 pt-2">
+    <div class="section-card" formGroupName="vehicleBase">
+      <h3 class="section-title">
+        <mat-icon>directions_car</mat-icon> 1. Perfil do Veículo
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Buscar Modelo (FIPE)</label>
+          <input
+            type="text"
+            [formControl]="modelSearchControl"
+            class="form-input"
+            placeholder="Ex: Doblo adv 1.4"
+            [matAutocomplete]="auto"
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            [displayWith]="displayVehicle"
+            (optionSelected)="onVehicleSelected($event.option.value)"
+          >
+            @for (
+              vehicle of filteredVehicles$ | async;
+              track vehicle.fipeCode
+            ) {
+              <mat-option [value]="vehicle"
+                >{{ vehicle.name }} (FIPE: {{ vehicle.fipeCode }})</mat-option
+              >
+            }
+          </mat-autocomplete>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ano Modelo</label>
+          <select
+            formControlName="yearId"
+            class="form-input"
+            [class.opacity-50]="availableYears.length === 0 || isLoadingYears"
+          >
+            <option value="" disabled selected>
+              {{ isLoadingYears ? "Carregando..." : "Selecione..." }}
+            </option>
+            @for (year of availableYears; track year.code) {
+              <option [value]="year.code">{{ year.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card" formGroupName="coverages">
+      <h3 class="section-title">
+        <mat-icon>shield</mat-icon> 2. Coberturas do Lote
+      </h3>
+      <div class="coverages-grid">
+        <div class="coverage-item">
+          <mat-checkbox formControlName="casco" color="primary"
+            >Casco (Compreensiva)</mat-checkbox
+          >
+          @if (form.get("coverages.casco")?.value) {
+            <div class="coverage-input-wrapper">
+              <label>% da FIPE</label>
+              <input
+                type="number"
+                formControlName="cascoPercentage"
+                class="form-input small-input"
+              />
+            </div>
+          }
+        </div>
+
+        <div class="coverage-item">
+          <mat-checkbox formControlName="rcfDm" color="primary"
+            >RCF - Danos Materiais</mat-checkbox
+          >
+          @if (form.get("coverages.rcfDm")?.value) {
+            <div class="coverage-input-wrapper">
+              <label>LMI (R$)</label>
+              <input
+                type="number"
+                formControlName="rcfDmValue"
+                class="form-input small-input"
+              />
+            </div>
+          }
+        </div>
+
+        <div class="coverage-item">
+          <mat-checkbox formControlName="rcfDc" color="primary"
+            >RCF - Danos Corporais</mat-checkbox
+          >
+          @if (form.get("coverages.rcfDc")?.value) {
+            <div class="coverage-input-wrapper">
+              <label>LMI (R$)</label>
+              <input
+                type="number"
+                formControlName="rcfDcValue"
+                class="form-input small-input"
+              />
+            </div>
+          }
+        </div>
+
+        <div class="coverage-item">
+          <mat-checkbox formControlName="rcfDmo" color="primary"
+            >RCF - Danos Morais</mat-checkbox
+          >
+          @if (form.get("coverages.rcfDmo")?.value) {
+            <div class="coverage-input-wrapper">
+              <label>LMI (R$)</label>
+              <input
+                type="number"
+                formControlName="rcfDmoValue"
+                class="form-input small-input"
+              />
+            </div>
+          }
+        </div>
+
+        <div class="coverage-item">
+          <mat-checkbox formControlName="appMorte" color="primary"
+            >APP - Morte/Invalidez</mat-checkbox
+          >
+          @if (form.get("coverages.appMorte")?.value) {
+            <div class="coverage-input-wrapper">
+              <label>LMI (R$)</label>
+              <input
+                type="number"
+                formControlName="appMorteValue"
+                class="form-input small-input"
+              />
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3 class="section-title">
+        <mat-icon>pin</mat-icon> 3. Identificação (Placas)
+      </h3>
+
+      <div class="form-group mb-4 w-48">
+        <label class="form-label">Quantidade de Veículos</label>
+        <input
+          type="number"
+          formControlName="plateCount"
+          class="form-input font-bold text-blue-800 text-lg"
+          min="1"
+          max="50"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4" formArrayName="plates">
+        @for (plateCtrl of platesArray.controls; track $index) {
+          <div class="form-group">
+            <label class="form-label text-xs">Placa #{{ $index + 1 }}</label>
+            <input
+              type="text"
+              [formControlName]="$index"
+              class="form-input text-center font-mono uppercase tracking-widest"
+              placeholder="ABC-1234"
+              maxlength="8"
+              (input)="onPlateInput($event, $index)"
+            />
+          </div>
+        }
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="form.invalid"
+  >
+    Adicionar {{ form.get("plateCount")?.value }} Veículo(s)
+  </button>
+</mat-dialog-actions>

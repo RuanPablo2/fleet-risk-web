@@ -5,7 +5,6 @@
         <mat-icon>arrow_back</mat-icon> Voltar
       </button>
     </div>
-
     <div class="header-content">
       <div>
         <h1 class="page-title">Editar Cotação #{{ quoteId }}</h1>
@@ -55,88 +54,21 @@
     </div>
 
     <div class="form-card">
-      <div class="card-header">
+      <div class="card-header flex justify-between items-center">
         <h2 class="card-title">Composição da Frota</h2>
+        @if (!isApproved) {
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="openAddVehicleDialog()"
+          >
+            <mat-icon>add_circle_outline</mat-icon> Adicionar Veículos em Lote
+          </button>
+        }
       </div>
 
       <div class="step-content">
-        <form
-          [formGroup]="vehicleForm"
-          (ngSubmit)="addVehicle()"
-          class="vehicle-form-grid"
-        >
-          <div class="form-group">
-            <label class="form-label">Placa</label>
-            <input
-              type="text"
-              formControlName="licensePlate"
-              class="form-input"
-              maxlength="8"
-              (input)="onPlateInput($event)"
-            />
-          </div>
-
-          <div class="form-group col-span-2">
-            <label class="form-label">Buscar Modelo (FIPE)</label>
-            <input
-              type="text"
-              [formControl]="modelSearchControl"
-              class="form-input"
-              [matAutocomplete]="auto"
-            />
-            <mat-autocomplete
-              #auto="matAutocomplete"
-              [displayWith]="displayVehicle"
-              (optionSelected)="onVehicleSelected($event.option.value)"
-            >
-              @for (
-                vehicle of filteredVehicles$ | async;
-                track vehicle.fipeCode
-              ) {
-                <mat-option [value]="vehicle"
-                  >{{ vehicle.name }} (FIPE: {{ vehicle.fipeCode }})</mat-option
-                >
-              }
-            </mat-autocomplete>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Ano Modelo</label>
-            <select
-              formControlName="yearId"
-              class="form-input"
-              [class.opacity-50]="availableYears.length === 0 || isLoadingYears"
-            >
-              <option value="" disabled selected>
-                {{ isLoadingYears ? "Carregando..." : "Selecione..." }}
-              </option>
-              @for (year of availableYears; track year.code) {
-                <option [value]="year.code">{{ year.name }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Cobertura (R$)</label>
-            <input
-              type="number"
-              formControlName="coverageLimit"
-              class="form-input"
-            />
-          </div>
-
-          <div class="add-vehicle-action">
-            <button
-              mat-stroked-button
-              color="primary"
-              type="submit"
-              [disabled]="vehicleForm.invalid"
-            >
-              <mat-icon>add</mat-icon>
-            </button>
-          </div>
-        </form>
-
         <div class="vehicles-table-container">
           <table mat-table [dataSource]="vehicles" class="fleet-table">
             <ng-container matColumnDef="licensePlate">
@@ -176,27 +108,59 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="coverageLimit">
-              <th mat-header-cell *matHeaderCellDef>Cobertura</th>
+            <ng-container matColumnDef="coverages">
+              <th mat-header-cell *matHeaderCellDef>Coberturas</th>
               <td mat-cell *matCellDef="let v" class="text-gray-600">
-                {{ v.coverageLimit | currency: "BRL" : "symbol" }}
+                <span
+                  class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded"
+                >
+                  {{ v.coverages?.length || 0 }} ativas
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="calculatedPremium">
+              <th mat-header-cell *matHeaderCellDef>Prêmio</th>
+              <td
+                mat-cell
+                *matCellDef="let v"
+                class="font-semibold text-green-700"
+              >
+                {{
+                  v.calculatedPremium
+                    ? (v.calculatedPremium | currency: "BRL" : "symbol")
+                    : "-"
+                }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef class="text-right">
-                Remover
+                Ações
               </th>
               <td
                 mat-cell
                 *matCellDef="let v; let i = index"
-                class="text-right"
+                class="text-right whitespace-nowrap"
               >
+                <button
+                  mat-icon-button
+                  color="primary"
+                  type="button"
+                  (click)="editVehicle(i)"
+                  [disabled]="isApproved"
+                  matTooltip="Editar Veículo"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+
                 <button
                   mat-icon-button
                   color="warn"
                   type="button"
                   (click)="removeVehicle(i)"
+                  [disabled]="isApproved"
+                  matTooltip="Remover Veículo"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -230,15 +194,14 @@
             <mat-icon class="text-indigo-600 mt-0.5">lightbulb</mat-icon>
             <p class="text-sm text-indigo-900 m-0">
               <strong>Quer ver a mensageria na prática?</strong> Crie uma nova
-              conta no sistema utilizando um e-mail do
+              conta utilizando um e-mail do
               <a
                 href="https://temp-mail.org/pt/"
                 target="_blank"
-                class="font-bold underline hover:text-indigo-700 transition-colors"
+                class="font-bold underline hover:text-indigo-700"
                 >temp-mail.org</a
               >
-              e aprove uma cotação para receber a proposta real em PDF por
-              e-mail.
+              e aprove uma cotação para receber a proposta real em PDF.
             </p>
           </div>
         }
@@ -311,7 +274,6 @@
               >
                 <mat-icon class="text-sm">verified</mat-icon> Proposta gerada
               </div>
-
               <button
                 mat-stroked-button
                 color="primary"
@@ -321,7 +283,6 @@
               >
                 <mat-icon>send</mat-icon> Reenviar E-mail
               </button>
-
               <button
                 mat-flat-button
                 color="primary"

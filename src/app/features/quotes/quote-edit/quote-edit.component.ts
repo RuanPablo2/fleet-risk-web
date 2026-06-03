@@ -4,36 +4,24 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
-  FormControl,
 } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { CurrencyPipe, AsyncPipe } from '@angular/common';
-import { Observable, of } from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  switchMap,
-  catchError,
-} from 'rxjs/operators';
+import { CurrencyPipe } from '@angular/common';
+
 import {
   QuoteService,
   CreateQuoteRequest,
-  VehicleQuote,
   QuoteDetails,
 } from '../../../core/services/quote.service';
-import {
-  VehicleService,
-  VehicleSearchResult,
-  VehicleYear,
-} from '../../../core/services/vehicle.service';
-
 import { WebsocketService } from '../../../core/services/websocket.service';
+
+import { QuoteVehicleDialogComponent } from '../quote-vehicle-dialog/quote-vehicle-dialog.component';
 
 @Component({
   selector: 'app-quote-edit',
@@ -45,10 +33,9 @@ import { WebsocketService } from '../../../core/services/websocket.service';
     MatButtonModule,
     MatIconModule,
     MatTableModule,
-    MatAutocompleteModule,
+    MatDialogModule,
     MatProgressSpinnerModule,
     CurrencyPipe,
-    AsyncPipe,
   ],
   templateUrl: './quote-edit.component.html',
   styleUrl: './quote-edit.component.scss',
@@ -56,10 +43,10 @@ import { WebsocketService } from '../../../core/services/websocket.service';
 export class QuoteEditComponent implements OnInit {
   private fb = inject(FormBuilder);
   private quoteService = inject(QuoteService);
-  private vehicleService = inject(VehicleService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private websocketService = inject(WebsocketService);
+  private dialog = inject(MatDialog);
 
   quoteId!: number;
   isLoadingData = true;
@@ -77,29 +64,15 @@ export class QuoteEditComponent implements OnInit {
     ],
   });
 
-  vehicleForm: FormGroup = this.fb.group({
-    licensePlate: [
-      '',
-      [Validators.required, Validators.minLength(8), Validators.maxLength(8)],
-    ],
-    fipeCode: ['', Validators.required],
-    modelName: [''],
-    yearId: ['', Validators.required],
-    coverageLimit: [1000000, [Validators.required, Validators.min(1)]],
-  });
+  vehicles: any[] = [];
 
-  modelSearchControl = new FormControl('');
-  filteredVehicles$!: Observable<VehicleSearchResult[]>;
-  availableYears: VehicleYear[] = [];
-  isLoadingYears = false;
-
-  vehicles: VehicleQuote[] = [];
   displayedColumns: string[] = [
     'licensePlate',
     'modelName',
     'fipeCode',
     'yearId',
-    'coverageLimit',
+    'coverages',
+    'calculatedPremium',
     'actions',
   ];
 
@@ -114,19 +87,6 @@ export class QuoteEditComponent implements OnInit {
     this.customerForm.valueChanges.subscribe(() => {
       this.resetCalculationState();
     });
-
-    this.filteredVehicles$ = this.modelSearchControl.valueChanges.pipe(
-      debounceTime(400),
-      distinctUntilChanged(),
-      switchMap((query) => {
-        if (query && query.length >= 3) {
-          return this.vehicleService
-            .searchModels(query)
-            .pipe(catchError(() => of([])));
-        }
-        return of([]);
-      }),
-    );
 
     this.websocketService.watchQuoteStatus(this.quoteId).subscribe((status) => {
       if (status === 'CALCULATED') {
@@ -157,7 +117,8 @@ export class QuoteEditComponent implements OnInit {
           modelName: v.modelName || 'Modelo não informado',
           fipeCode: v.fipeCode,
           yearId: v.yearId,
-          coverageLimit: v.coverageLimit,
+          coverages: v.coverages || [],
+          calculatedPremium: v.calculatedPremium,
         }));
 
         this.isLoadingData = false;
@@ -197,50 +158,49 @@ export class QuoteEditComponent implements OnInit {
     this.resetCalculationState();
   }
 
-  onPlateInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    let value = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    if (value.length > 7) value = value.slice(0, 7);
-    if (value.length > 3)
-      value = value.replace(/^([A-Z]{3})([0-9A-Z]{0,4})/, '$1-$2');
-    input.value = value;
-    this.vehicleForm.get('licensePlate')?.setValue(value, { emitEvent: false });
-  }
-
-  displayVehicle(vehicle: VehicleSearchResult): string {
-    return vehicle ? `${vehicle.name} (FIPE: ${vehicle.fipeCode})` : '';
-  }
-
-  onVehicleSelected(vehicle: VehicleSearchResult) {
-    this.vehicleForm.patchValue({
-      fipeCode: vehicle.fipeCode,
-      modelName: vehicle.name,
-      yearId: '',
+  openAddVehicleDialog() {
+    const dialogRef = this.dialog.open(QuoteVehicleDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      disableClose: true,
     });
 
-    this.availableYears = [];
-    this.isLoadingYears = true;
-
-    this.vehicleService.getAvailableYears(vehicle.fipeCode).subscribe({
-      next: (years) => {
-        this.availableYears = years;
-        this.isLoadingYears = false;
-      },
-      error: (err) => {
-        console.error('Erro ao buscar anos da FIPE:', err);
-        this.isLoadingYears = false;
-      },
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (
+        result &&
+        result.vehicles &&
+        result.vehicles.length > 0 &&
+        !result.isEdit
+      ) {
+        this.vehicles = [...this.vehicles, ...result.vehicles];
+        this.resetCalculationState();
+      }
     });
   }
 
-  addVehicle() {
-    if (this.vehicleForm.valid) {
-      this.vehicles = [...this.vehicles, this.vehicleForm.value];
-      this.vehicleForm.reset({ coverageLimit: 1000000 });
-      this.modelSearchControl.reset();
-      this.availableYears = [];
-      this.resetCalculationState();
-    }
+  editVehicle(index: number) {
+    const dialogRef = this.dialog.open(QuoteVehicleDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        vehicle: this.vehicles[index],
+        index: index,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (
+        result &&
+        result.vehicles &&
+        result.vehicles.length > 0 &&
+        result.isEdit
+      ) {
+        this.vehicles[result.editIndex] = result.vehicles[0];
+        this.vehicles = [...this.vehicles];
+        this.resetCalculationState();
+      }
+    });
   }
 
   removeVehicle(index: number) {
@@ -261,9 +221,8 @@ export class QuoteEditComponent implements OnInit {
       if (shouldCalculate) {
         this.isCalculating = true;
         this.quoteService.calculateQuote(this.quoteId, payload).subscribe({
-          next: () => {
-            console.log('Cálculo enviado para a fila. Aguardando retorno...');
-          },
+          next: () =>
+            console.log('Cálculo enviado para a fila. Aguardando retorno...'),
           error: (err) => {
             console.error('Erro ao calcular:', err);
             this.isSubmitting = false;

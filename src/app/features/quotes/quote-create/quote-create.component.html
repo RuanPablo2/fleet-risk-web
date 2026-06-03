@@ -45,96 +45,19 @@
   </div>
 
   <div class="form-card">
-    <div class="card-header">
+    <div class="card-header flex justify-between items-center">
       <h2 class="card-title">Composição da Frota</h2>
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="openAddVehicleDialog()"
+      >
+        <mat-icon>add_circle_outline</mat-icon> Adicionar Veículos em Lote
+      </button>
     </div>
 
     <div class="step-content">
-      <form
-        [formGroup]="vehicleForm"
-        (ngSubmit)="addVehicle()"
-        class="vehicle-form-grid"
-      >
-        <div class="form-group">
-          <label class="form-label">Placa</label>
-          <input
-            type="text"
-            formControlName="licensePlate"
-            class="form-input"
-            placeholder="ABC-1234"
-            maxlength="8"
-            (input)="onPlateInput($event)"
-          />
-        </div>
-
-        <div class="form-group col-span-2">
-          <label class="form-label">Buscar Modelo (FIPE)</label>
-          <input
-            type="text"
-            [formControl]="modelSearchControl"
-            class="form-input"
-            placeholder="Ex: Doblo adv 1.4"
-            [matAutocomplete]="auto"
-          />
-          <mat-autocomplete
-            #auto="matAutocomplete"
-            [displayWith]="displayVehicle"
-            (optionSelected)="onVehicleSelected($event.option.value)"
-          >
-            @for (
-              vehicle of filteredVehicles$ | async;
-              track vehicle.fipeCode
-            ) {
-              <mat-option [value]="vehicle">
-                {{ vehicle.name }} (FIPE: {{ vehicle.fipeCode }})
-              </mat-option>
-            }
-          </mat-autocomplete>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Ano Modelo</label>
-          <select
-            formControlName="yearId"
-            class="form-input"
-            [class.opacity-50]="availableYears.length === 0 || isLoadingYears"
-          >
-            <option value="" disabled selected>
-              @if (isLoadingYears) {
-                Carregando...
-              } @else {
-                Selecione...
-              }
-            </option>
-            @for (year of availableYears; track year.code) {
-              <option [value]="year.code">
-                {{ year.name }}
-              </option>
-            }
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Cobertura (R$)</label>
-          <input
-            type="number"
-            formControlName="coverageLimit"
-            class="form-input"
-          />
-        </div>
-
-        <div class="add-vehicle-action">
-          <button
-            mat-stroked-button
-            color="primary"
-            type="submit"
-            [disabled]="vehicleForm.invalid"
-          >
-            <mat-icon>add</mat-icon>
-          </button>
-        </div>
-      </form>
-
       <div class="vehicles-table-container">
         <table mat-table [dataSource]="vehicles" class="fleet-table">
           <ng-container matColumnDef="licensePlate">
@@ -170,10 +93,14 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="coverageLimit">
-            <th mat-header-cell *matHeaderCellDef>Cobertura</th>
+          <ng-container matColumnDef="coverages">
+            <th mat-header-cell *matHeaderCellDef>Coberturas</th>
             <td mat-cell *matCellDef="let v" class="text-gray-600">
-              {{ v.coverageLimit | currency: "BRL" : "symbol" }}
+              <span
+                class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded"
+              >
+                {{ v.coverages?.length || 0 }} ativas
+              </span>
             </td>
           </ng-container>
 
@@ -182,6 +109,14 @@
               Remover
             </th>
             <td mat-cell *matCellDef="let v; let i = index" class="text-right">
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="editVehicle(i)"
+                matTooltip="Editar Veículo"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
               <button
                 mat-icon-button
                 color="warn"
@@ -203,14 +138,14 @@
 
         @if (vehicles.length === 0) {
           <div class="empty-state">
-            Nenhum veículo adicionado. Informe os dados acima e clique no (+).
+            A frota está vazia. Clique no botão "Adicionar Veículos em Lote"
+            acima para começar.
           </div>
         }
       </div>
 
       <div class="step-actions split-actions">
         <div></div>
-
         <div class="flex gap-4">
           <button
             mat-stroked-button
@@ -221,13 +156,8 @@
               vehicles.length === 0 || isSubmitting || customerForm.invalid
             "
           >
-            @if (isSubmitting) {
-              Salvando...
-            } @else {
-              Salvar Rascunho
-            }
+            {{ isSubmitting ? "Salvando..." : "Salvar Rascunho" }}
           </button>
-
           <button
             mat-flat-button
             color="primary"
@@ -237,8 +167,7 @@
               vehicles.length === 0 || isSubmitting || customerForm.invalid
             "
           >
-            <mat-icon>calculate</mat-icon>
-            Calcular Frota
+            <mat-icon>calculate</mat-icon> Calcular Frota
           </button>
         </div>
       </div>
