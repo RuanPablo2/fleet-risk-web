@@ -82,6 +82,8 @@ export class QuoteEditComponent implements OnInit {
 
     if (history.state && history.state.isCalculating) {
       this.isCalculating = true;
+      this.isSubmitting = true;
+      this.startPollingFallback();
     }
 
     this.customerForm.valueChanges.subscribe(() => {
@@ -221,8 +223,10 @@ export class QuoteEditComponent implements OnInit {
       if (shouldCalculate) {
         this.isCalculating = true;
         this.quoteService.calculateQuote(this.quoteId, payload).subscribe({
-          next: () =>
-            console.log('Cálculo enviado para a fila. Aguardando retorno...'),
+          next: () => {
+            console.log('Cálculo enviado para a fila. Aguardando retorno...');
+            this.startPollingFallback();
+          },
           error: (err) => {
             console.error('Erro ao calcular:', err);
             this.isSubmitting = false;
@@ -296,5 +300,26 @@ export class QuoteEditComponent implements OnInit {
         this.isActionProcessing = false;
       },
     });
+  }
+
+  startPollingFallback() {
+    const pollInterval = setInterval(() => {
+      if (!this.isCalculating) {
+        clearInterval(pollInterval);
+        return;
+      }
+
+      this.quoteService.getQuoteById(this.quoteId).subscribe({
+        next: (quote) => {
+          if (quote.status === 'CALCULATED' || quote.status === 'APPROVED') {
+            console.log('🔄 Fallback: O cálculo já terminou no backend!');
+            this.isCalculating = false;
+            this.isSubmitting = false;
+            this.loadQuoteData();
+            clearInterval(pollInterval);
+          }
+        },
+      });
+    }, 3000);
   }
 }

@@ -56,16 +56,14 @@
     <div class="form-card">
       <div class="card-header flex justify-between items-center">
         <h2 class="card-title">Composição da Frota</h2>
-        @if (!isApproved) {
-          <button
-            mat-flat-button
-            color="primary"
-            type="button"
-            (click)="openAddVehicleDialog()"
-          >
-            <mat-icon>add_circle_outline</mat-icon> Adicionar Veículos em Lote
-          </button>
-        }
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="openAddVehicleDialog()"
+        >
+          <mat-icon>add_circle_outline</mat-icon> Adicionar Veículos em Lote
+        </button>
       </div>
 
       <div class="step-content">
@@ -148,7 +146,6 @@
                   color="primary"
                   type="button"
                   (click)="editVehicle(i)"
-                  [disabled]="isApproved"
                   matTooltip="Editar Veículo"
                 >
                   <mat-icon>edit</mat-icon>
@@ -159,7 +156,6 @@
                   color="warn"
                   type="button"
                   (click)="removeVehicle(i)"
-                  [disabled]="isApproved"
                   matTooltip="Remover Veículo"
                 >
                   <mat-icon>delete</mat-icon>
