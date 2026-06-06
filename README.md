@@ -20,6 +20,8 @@ O **FleetRisk Web** é o frontend principal do ecossistema de subscrição de se
 
 - **Zero-Friction Demo:** Interface de login projetada com a funcionalidade One-Click Demo, permitindo que recrutadores e avaliadores técnicos testem o sistema instantaneamente sem a necessidade de preencher formulários de cadastro.
 
+- - **Modelagem Granular e Reidratação de Dados:** Formulários reativos projetados para lidar com a complexidade de múltiplas coberturas (Casco, RCF, APP). Através da _reidratação de dados_, o corretor pode destravar e editar frotas já aprovadas sem perder o progresso, recuperando os dados instantaneamente na interface para alterações cirúrgicas.
+
 - **UX Educativa:** Banners contextuais integrados na interface (como a dica de uso do Temp-Mail) que guiam o avaliador a testar as integrações assíncronas do backend (envio de e-mails via RabbitMQ) diretamente pela UI.
 
 - **Mobile-First & Layout Adaptativo:** Utilização do `BreakpointObserver` do Angular CDK para transformar dinamicamente a barra de navegação em uma gaveta flutuante (`drawer`) em dispositivos móveis. Tabelas densas de dados atuariais foram otimizadas com rolagem horizontal contida, garantindo que o painel da corretora seja 100% responsivo em qualquer formato de tela.
