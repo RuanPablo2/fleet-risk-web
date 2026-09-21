@@ -18,6 +18,8 @@ O **FleetRisk Web** é o frontend principal do ecossistema de subscrição de se
 
 ## 🔥 Highlights Técnicos (diferenciais do projeto)
 
+- **IA Generativa & Assistente Virtual (RAG):** Integração de um chatbot de suporte (FleetBot) treinado estritamente nas regras de negócio e Condições Gerais da seguradora. Utiliza a arquitetura *Retrieval-Augmented Generation* para evitar alucinações e entregar respostas precisas aos corretores. O script de terceiros foi encapsulado e injetado dinamicamente via `Renderer2` do Angular, respeitando o ciclo de vida da aplicação e as diretrizes de sanitização do DOM contra ataques XSS.
+
 - **Zero-Friction Demo:** Interface de login projetada com a funcionalidade One-Click Demo, permitindo que recrutadores e avaliadores técnicos testem o sistema instantaneamente sem a necessidade de preencher formulários de cadastro.
 
 - - **Modelagem Granular e Reidratação de Dados:** Formulários reativos projetados para lidar com a complexidade de múltiplas coberturas (Casco, RCF, APP). Através da _reidratação de dados_, o corretor pode destravar e editar frotas já aprovadas sem perder o progresso, recuperando os dados instantaneamente na interface para alterações cirúrgicas.
@@ -120,6 +122,15 @@ Esta seção apresenta a interface visual do FleetRisk.
   <p align="center">
     <b>E-mail de notificação de cotação</b><br>
     <img src="./public/screenshots/propose-email.png" alt="E-mail de notificação de cotação" width="700px">
+  </p>
+</div>
+
+<br><br>
+
+  <h3>🤖 Assistente Virtual em Tempo Real (IA)</h3>
+  <p align="center">
+    <b>Suporte inteligente baseado em RAG validando dependência de coberturas</b><br>
+    <img src="./public/screenshots/fleetbot-chat.png" alt="Assistente Virtual FleetBot respondendo regras do RCF-DMO" width="900px">
   </p>
 </div>
 
