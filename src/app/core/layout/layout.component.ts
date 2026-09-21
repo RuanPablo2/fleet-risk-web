@@ -10,6 +10,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
+import { FleetBotComponent } from '../../shared/components/fleet-bot/fleet-bot.component';
 
 @Component({
   selector: 'app-layout',
@@ -24,6 +25,7 @@ import { map, shareReplay } from 'rxjs/operators';
     MatIconModule,
     MatButtonModule,
     AsyncPipe,
+    FleetBotComponent
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
