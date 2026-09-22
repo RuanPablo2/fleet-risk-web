@@ -11,7 +11,7 @@ export class GeminiService {
   constructor() {}
 
   async generateSalesPitch(veiculo: string, valor: number, coberturas: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     const prompt = `
       Você é um especialista em vendas de seguro de frota da corretora FleetRisk.
