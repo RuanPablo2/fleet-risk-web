@@ -181,6 +181,25 @@
               </p>
             </div>
           </div>
+
+          <!-- INTEGRAÇÃO COM IA GERATIVA (GEMINI) -->
+          <div class="ai-pitch-container">
+            <button 
+              mat-stroked-button 
+              color="primary" 
+              (click)="generateAIPitch()" 
+              [disabled]="isGeneratingPitch">
+              <mat-icon>auto_awesome</mat-icon> 
+              {{ isGeneratingPitch ? 'Processando com IA...' : 'Gerar Argumento de Venda (IA)' }}
+            </button>
+
+            @if (salesPitch) {
+              <div class="ai-pitch-box">
+                <strong>Sugestão de WhatsApp:</strong>
+                <p>{{ salesPitch }}</p>
+              </div>
+            }
+          </div>
         }
 
         @if (isApproved) {

@@ -22,6 +22,7 @@ import {
 import { WebsocketService } from '../../../core/services/websocket.service';
 
 import { QuoteVehicleDialogComponent } from '../quote-vehicle-dialog/quote-vehicle-dialog.component';
+import { GeminiService } from '../../../core/services/gemini.service';
 
 @Component({
   selector: 'app-quote-edit',
@@ -47,6 +48,10 @@ export class QuoteEditComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private websocketService = inject(WebsocketService);
   private dialog = inject(MatDialog);
+  private geminiService = inject(GeminiService);
+
+  salesPitch: string = '';
+  isGeneratingPitch = false;
 
   quoteId!: number;
   isLoadingData = true;
@@ -208,6 +213,27 @@ export class QuoteEditComponent implements OnInit {
   removeVehicle(index: number) {
     this.vehicles = this.vehicles.filter((_, i) => i !== index);
     this.resetCalculationState();
+  }
+
+  async generateAIPitch() {
+    if (!this.quoteDetails || !this.quoteDetails.totalPremium) return;
+
+    this.isGeneratingPitch = true;
+    this.salesPitch = '';
+
+    const vehicleNames = this.quoteDetails.vehicles.map(v => v.modelName).join(', ');
+    
+    const coverages = [...new Set(this.quoteDetails.vehicles.flatMap(v => v.coverages.map(c => c.type)))].join(', ');
+    
+    const premiumValue = this.quoteDetails.totalPremium;
+
+    try {
+      this.salesPitch = await this.geminiService.generateSalesPitch(vehicleNames, premiumValue, coverages);
+    } catch (error) {
+      this.salesPitch = 'Erro ao conectar com o Google Gemini. Tente novamente.';
+    } finally {
+      this.isGeneratingPitch = false;
+    }
   }
 
   onSubmit(shouldCalculate: boolean) {
