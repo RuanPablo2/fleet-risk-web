@@ -12,7 +12,7 @@ O **FleetRisk Web** é o frontend principal do ecossistema de subscrição de se
 
 ## 🚀 Acesse o projeto em produção
 
-- **Aplicação Front-end:** https://fleetrisk.netlify.app/login
+- **Aplicação Front-end:** [https://fleetrisk.netlify.app](https://fleetrisk.vercel.app)
 
 - **Documentação da API (Swagger):** https://fleetrisk-ruanpablo2.duckdns.org/swagger-ui/index.html
 
@@ -108,25 +108,19 @@ Esta seção apresenta a interface visual do FleetRisk.
       </td>
     </tr>
   </table>
-
-<br><br>
-
+<br>
   <h3>Proposta em PDF e notificação</h3>
   <p align="center">
     <b>Proposta em PDF</b><br>
     <img src="./public/screenshots/propose.png" alt="PDF da proposta" width="700px">
   </p>
-  
   <br>
-
   <p align="center">
     <b>E-mail de notificação de cotação</b><br>
     <img src="./public/screenshots/propose-email.png" alt="E-mail de notificação de cotação" width="700px">
   </p>
 </div>
-
-<br><br>
-
+<br>
   <h3>🤖 Assistente Virtual em Tempo Real (IA)</h3>
   <p align="center">
     <b>Suporte inteligente baseado em RAG validando dependência de coberturas</b><br>
