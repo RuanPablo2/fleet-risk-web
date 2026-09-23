@@ -146,4 +146,8 @@ export class QuoteService {
       responseType: 'blob',
     });
   }
+
+  generateBrokerMessage(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/broker-message`, {});
+  }
 }
