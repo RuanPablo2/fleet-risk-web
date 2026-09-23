@@ -12,7 +12,7 @@ O **FleetRisk Web** é o frontend principal do ecossistema de subscrição de se
 
 ## 🚀 Acesse o projeto em produção
 
-- **Aplicação Front-end:** [https://fleetrisk.netlify.app](https://fleetrisk.vercel.app)
+- **Aplicação Front-end:** [https://fleetrisk.vercel.app](https://fleetrisk.vercel.app)
 
 - **Documentação da API (Swagger):** https://fleetrisk-ruanpablo2.duckdns.org/swagger-ui/index.html
 
